@@ -1,0 +1,88 @@
+.sidebar .active {
+  background-color: #f57c00 !important;
+  color: white !important;
+  font-weight: bold;
+}
+.sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.list-group-item {
+  border: none;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+}
+
+.list-group-item:hover {
+  background-color: #343a40 !important;
+}
+
+.list-group-item.active {
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+.sidebar {
+  width: 250px; /* Ancho fijo para el sidebar */
+  background-color: #1c2526; /* Fondo oscuro como en la captura */
+  color: white;
+  height: 100vh;
+  position: fixed; /* Fijar el sidebar para que no se desplace */
+  top: 0;
+  left: 0;
+  overflow-y: auto; /* Permitir scroll si hay muchos ítems */
+}
+
+.sidebar h4 {
+  color: white;
+  font-weight: bold;
+}
+
+.sidebar-item {
+  background-color: transparent !important; /* Fondo transparente para los ítems */
+  color: white !important; /* Letras blancas */
+  border: none !important; /* Sin bordes */
+  padding: 10px 15px; /* Espaciado interno */
+  font-size: 1.1rem; /* Tamaño de fuente */
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-item:hover {
+  background-color: #2a3435 !important; /* Fondo más claro al pasar el mouse */
+  color: white !important;
+}
+
+.sidebar-item.active {
+  background-color: #007bff !important; /* Fondo azul para el ítem activo */
+  color: white !important;
+  font-weight: bold;
+}
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #343a40;
+  color: white;
+  padding-top: 20px;
+}
+
+.sidebar-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.5rem;
+}
+
+.nav-link {
+  color: white !important;
+  padding: 10px 20px;
+}
+
+.nav-link:hover {
+  background-color: #495057;
+}
