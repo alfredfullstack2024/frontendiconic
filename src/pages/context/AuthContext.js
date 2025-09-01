@@ -7,66 +7,73 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false); // Iniciamos sin loading
+  const [loading, setLoading] = useState(true); // ahora sí usamos loading
   const navigate = useNavigate();
 
+  // Verifica si hay token al cargar la app
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("Token configurado en headers:", token);
+      api
+        .get("/auth/me")
+        .then((response) => {
+          setUser({ ...response.data, token });
+        })
+        .catch((error) => {
+          console.error("Error en /auth/me:", error.message);
+          localStorage.removeItem("token");
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
     } else {
-      delete api.defaults.headers.common["Authorization"];
-      console.log("No hay token para configurar en headers");
+      setLoading(false);
     }
-  }, [user]);
-
-  // Desactivamos temporalmente la llamada a /auth/me
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   console.log("Token en localStorage al iniciar:", token);
-  //   if (token) {
-  //     api.get("/auth/me").then((response) => {
-  //       console.log("Datos de /auth/me:", response.data);
-  //       setUser({ ...response.data, token });
-  //     }).catch((error) => {
-  //       console.error("Error en /auth/me:", error.message);
-  //       localStorage.removeItem("token");
-  //       setUser(null);
-  //     });
-  //   }
-  // }, []);
+  }, []);
 
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
       console.log("Respuesta de /auth/login:", response.data);
+
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
+
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
       setUser({ ...userData, token });
+
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0);
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Error al iniciar sesión:", error.message);
+      console.error("Error al iniciar sesión:", error);
       throw new Error(error.response?.data?.message || "Error al iniciar sesión");
     }
   };
 
   const register = async (nombre, email, password, rol) => {
     try {
-      const response = await api.post("/auth/register", { nombre, email, password, role: rol });
+      // 👇 corregido: se envía "rol" igual que en tu base de datos
+      const response = await api.post("/auth/register", {
+        nombre,
+        email,
+        password,
+        rol,
+      });
+
       console.log("Respuesta de /auth/register:", response.data);
+
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
+
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
       setUser({ ...userData, token });
+
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0);
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Error al registrar usuario:", error.message);
+      console.error("Error al registrar usuario:", error);
       throw new Error(error.response?.data?.message || "Error al registrar usuario");
     }
   };
@@ -80,14 +87,16 @@ const AuthProvider = ({ children }) => {
 
   const hasPermission = (requiredRole) => {
     if (!user) return false;
-    console.log("Rol del usuario:", user.role, "Rol requerido:", requiredRole);
-    if (user.role === "admin") return true;
-    return user.role === requiredRole;
+    console.log("Rol del usuario:", user.rol, "Rol requerido:", requiredRole);
+    if (user.rol === "admin") return true;
+    return user.rol === requiredRole;
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
-      {children} {/* Renderizamos siempre por ahora */}
+    <AuthContext.Provider
+      value={{ user, setUser, loading, login, register, logout, hasPermission }}
+    >
+      {!loading && children} {/* Renderizamos solo cuando termina de cargar */}
     </AuthContext.Provider>
   );
 };
