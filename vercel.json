@@ -5,6 +5,14 @@
       "destination": "https://backend-5zxh.onrender.com/api/:path*"
     },
     {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
