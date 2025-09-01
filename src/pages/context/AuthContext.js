@@ -7,74 +7,61 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // ahora sí usamos loading
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Verifica si hay token al cargar la app
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      api
-        .get("/auth/me")
-        .then((response) => {
-          setUser({ ...response.data, token });
-        })
-        .catch((error) => {
-          console.error("Error en /auth/me:", error.message);
-          localStorage.removeItem("token");
-          setUser(null);
-        })
-        .finally(() => setLoading(false));
+      console.log("Token configurado en headers:", token);
     } else {
-      setLoading(false);
+      delete api.defaults.headers.common["Authorization"];
+      console.log("No hay token para configurar en headers");
     }
   }, []);
 
   const login = async (email, password) => {
     try {
+      setLoading(true);
       const response = await api.post("/auth/login", { email, password });
-      console.log("Respuesta de /auth/login:", response.data);
-
       const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
-
+      if (!token) throw new Error("No se recibió token desde el servidor");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      setUser({ ...userData, token });
-
+      const rol = userData.rol || userData.role || "user";
+      const finalUser = { ...userData, rol, token };
+      setUser(finalUser);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      setLoading(false);
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-      throw new Error(error.response?.data?.message || "Error al iniciar sesión");
+    } catch (err) {
+      setLoading(false);
+      console.error("Error al iniciar sesión:", err);
+      // intenta obtener mensaje del servidor, si no mostrar genérico
+      const msg = err.response?.data?.message || err.response?.data?.mensaje || err.message || "Error al iniciar sesión";
+      throw new Error(msg);
     }
   };
 
-  const register = async (nombre, email, password, rol) => {
+  const register = async (nombre, email, password, rolParam) => {
     try {
-      // 👇 corregido: se envía "rol" igual que en tu base de datos
-      const response = await api.post("/auth/register", {
-        nombre,
-        email,
-        password,
-        rol,
-      });
-
-      console.log("Respuesta de /auth/register:", response.data);
-
+      setLoading(true);
+      const response = await api.post("/users/register", { nombre, email, password, rol: rolParam });
       const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
-
+      if (!token) throw new Error("No se recibió token desde el servidor");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      setUser({ ...userData, token });
-
+      const rol = userData.rol || userData.role || rolParam || "user";
+      setUser({ ...userData, rol, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      setLoading(false);
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Error al registrar usuario:", error);
-      throw new Error(error.response?.data?.message || "Error al registrar usuario");
+    } catch (err) {
+      setLoading(false);
+      console.error("Error al registrar:", err);
+      const msg = err.response?.data?.message || err.response?.data?.mensaje || err.message || "Error al registrar";
+      throw new Error(msg);
     }
   };
 
@@ -87,23 +74,20 @@ const AuthProvider = ({ children }) => {
 
   const hasPermission = (requiredRole) => {
     if (!user) return false;
-    console.log("Rol del usuario:", user.rol, "Rol requerido:", requiredRole);
     if (user.rol === "admin") return true;
     return user.rol === requiredRole;
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, loading, login, register, logout, hasPermission }}
-    >
-      {!loading && children} {/* Renderizamos solo cuando termina de cargar */}
+    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
 const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth debe ser usado dentro de un AuthProvider");
+  if (!context) throw new Error("useAuth debe usarse dentro de AuthProvider");
   return context;
 };
 
