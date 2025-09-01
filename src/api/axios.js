@@ -1,3 +1,4 @@
+// src/api/axios.js
 import axios from "axios";
 
 // Función para obtener y validar la URL base del backend
@@ -5,7 +6,8 @@ const getBaseUrl = () => {
   const envUrl = process.env.REACT_APP_API_URL;
   const defaultDevUrl = "http://localhost:5000/api";
   const defaultProdUrl = "https://backend-5zxh.onrender.com/api";
-  const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
+  const baseUrl =
+    envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
 
   console.log("Depuración de URL - Variables de entorno:", {
     REACT_APP_API_URL: envUrl,
@@ -32,7 +34,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log("Token añadido a la solicitud:", {
-        token: token.substring(0, 10) + "...", // Mostrar solo parte por seguridad
+        token: token.substring(0, 10) + "...",
         url: `${config.baseURL}${config.url}`,
       });
     } else {
@@ -82,7 +84,7 @@ api.interceptors.response.use(
         headers: error.response.headers,
       });
       if (error.response.status === 401) {
-        console.error("Sesión expirada, redirigiendo a login... URL:", error.response.config.url);
+        console.error("Sesión expirada o no autorizada. Limpiando token y redirigiendo.");
         localStorage.removeItem("token");
         window.location.href = "/login";
         return Promise.reject(new Error("Sesión expirada. Por favor, inicia sesión nuevamente."));
@@ -115,7 +117,11 @@ api.interceptors.response.use(
   }
 );
 
-// Funciones exportadas para clientes
+/* ============================
+   Exported API helper functions
+   ============================ */
+
+// Clientes
 export const obtenerClientes = (config) => api.get("/clientes", config);
 export const consultarClientePorCedula = (numeroIdentificacion, config) =>
   api.get(`/clientes/consultar/${numeroIdentificacion}`, config);
@@ -133,21 +139,21 @@ export const obtenerClientesActivos = async (config = {}) => {
   }
 };
 
-// Funciones exportadas para productos
+// Productos
 export const obtenerProductos = (config) => api.get("/productos", config);
 export const obtenerProductoPorId = (id, config) => api.get(`/productos/${id}`, config);
 export const crearProducto = (data, config) => api.post("/productos", data, config);
 export const editarProducto = (id, data, config) => api.put(`/productos/${id}`, data, config);
 export const eliminarProducto = (id, config) => api.delete(`/productos/${id}`, config);
 
-// Funciones exportadas para membresías
+// Membresías
 export const obtenerMembresias = (config) => api.get("/membresias", config);
 export const obtenerMembresiaPorId = (id, config) => api.get(`/membresias/${id}`, config);
 export const crearMembresia = (data, config) => api.post("/membresias", data, config);
 export const editarMembresia = (id, data, config) => api.put(`/membresias/${id}`, data, config);
 export const eliminarMembresia = (id, config) => api.delete(`/membresias/${id}`, config);
 
-// Funciones exportadas para pagos
+// Pagos
 export const obtenerPagos = (params, config) => api.get("/pagos", { ...config, params });
 export const consultarPagosPorCedula = (numeroIdentificacion, config) =>
   api.get(`/pagos/consultar/${numeroIdentificacion}`, config);
@@ -156,21 +162,21 @@ export const crearPago = (data, config) => api.post("/pagos", data, config);
 export const editarPago = (id, data, config) => api.put(`/pagos/${id}`, data, config);
 export const eliminarPago = (id, config) => api.delete(`/pagos/${id}`, config);
 
-// Funciones exportadas para contabilidad
+// Contabilidad
 export const obtenerTransacciones = (params, config) => api.get("/contabilidad", { ...config, params });
 export const obtenerTransaccionPorId = (id, config) => api.get(`/contabilidad/${id}`, config);
 export const crearTransaccion = (data, config) => api.post("/contabilidad", data, config);
 export const editarTransaccion = (id, data, config) => api.put(`/contabilidad/${id}`, data, config);
 export const eliminarTransaccion = (id, config) => api.delete(`/contabilidad/${id}`, config);
 
-// Funciones exportadas para entrenadores
+// Entrenadores
 export const obtenerEntrenadores = (config) => api.get("/entrenadores", config);
 export const obtenerEntrenadorPorId = (id, config) => api.get(`/entrenadores/${id}`, config);
 export const crearEntrenador = (data, config) => api.post("/entrenadores", data, config);
 export const editarEntrenador = (id, data, config) => api.put(`/entrenadores/${id}`, data, config);
 export const eliminarEntrenador = (id, config) => api.delete(`/entrenadores/${id}`, config);
 
-// Funciones exportadas para rutinas
+// Rutinas
 export const obtenerRutinas = (config) => api.get("/rutinas", config);
 export const crearRutina = (data, config) => api.post("/rutinas", data, config);
 export const editarRutina = (id, data, config) => api.put(`/rutinas/${id}`, data, config);
@@ -180,31 +186,33 @@ export const eliminarAsignacionRutina = (id, config) => api.delete(`/rutinas/asi
 export const consultarRutinaPorNumeroIdentificacion = (numeroIdentificacion, config) =>
   api.get(`/rutinas/consultarRutinasPorNumeroIdentificacion/${numeroIdentificacion}`, config);
 
-// Funciones exportadas para clases
+// Clases
 export const obtenerClasesDisponibles = (config) => api.get("/clases/disponibles", config);
 export const registrarClienteEnClase = (data, config) => api.post("/clases/registrar", data, config);
 export const consultarClasesPorNumeroIdentificacion = (numeroIdentificacion, config) =>
   api.get(`/clases/consultar/${numeroIdentificacion}`, config);
 
-// Funciones exportadas para usuarios
+// Usuarios (endpoints genéricos si los usas)
 export const obtenerUsuarios = (config) => api.get("/users", config);
 export const editarUsuario = (id, data, config) => api.put(`/users/${id}`, data, config);
 
-// Funciones exportadas para composición corporal
+// Composición corporal
 export const crearComposicionCorporal = (data, config) => api.post("/composicion-corporal", data, config);
 export const consultarComposicionPorCliente = (identificacion, config) =>
   api.get(`/composicion-corporal/cliente/${identificacion}`, config);
 
-// Funciones exportadas para medición porristas
+// Medición porristas
 export const crearMedicionPorristas = (data, config) => api.post("/medicion-porristas", data, config);
 export const obtenerMedicionesPorristas = (config) => api.get("/medicion-porristas", config);
 export const editarMedicionPorristas = (id, data, config) => api.put(`/medicion-porristas/${id}`, data, config);
-export const eliminarMedicionPorristas = (id, config) => api.delete(`/medicion-porristas/${id}`, config); // Nueva función
+export const eliminarMedicionPorristas = (id, config) => api.delete(`/medicion-porristas/${id}`, config);
 
-// Funciones exportadas para autenticación
+// Autenticación
 export const login = (data) => api.post("/auth/login", data);
 export const registrarse = (data) => api.post("/auth/register", data);
 
 export default api;
+
+
 
 
