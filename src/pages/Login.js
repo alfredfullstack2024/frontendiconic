@@ -16,11 +16,9 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    try {
-      await login(formData.email, formData.password);
-    } catch (err) {
-      console.error("Error desde Login.js:", err.message);
-      setError(err.message);
+    const result = await login(formData.email, formData.password);
+    if (!result.success) {
+      setError(result.message || "Error al iniciar sesión");
     }
   };
 
