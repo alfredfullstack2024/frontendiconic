@@ -15,7 +15,6 @@ const Productos = () => {
   });
   const [error, setError] = useState("");
 
-  // Cargar productos al montar el componente
   useEffect(() => {
     const fetchProductos = async () => {
       try {
@@ -36,16 +35,13 @@ const Productos = () => {
     fetchProductos();
   }, []);
 
-  // Manejar cambios en el formulario
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Manejar el envío del formulario (crear o editar producto)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       const productoData = {
         nombre: formData.nombre,
@@ -55,9 +51,7 @@ const Productos = () => {
         estado: formData.estado,
       };
       console.log("Datos enviados al backend:", productoData);
-
       if (editingProducto) {
-        // Editar producto existente
         const response = await api.put(
           `/productos/${editingProducto._id}`,
           productoData
@@ -69,7 +63,6 @@ const Productos = () => {
           )
         );
       } else {
-        // Crear nuevo producto
         const response = await api.post("/productos", productoData);
         console.log("Producto creado:", response.data);
         setProductos([...productos, response.data]);
@@ -95,7 +88,6 @@ const Productos = () => {
     }
   };
 
-  // Abrir el modal para editar un producto
   const handleEdit = (producto) => {
     setEditingProducto(producto);
     setFormData({
@@ -108,7 +100,6 @@ const Productos = () => {
     setShowModal(true);
   };
 
-  // Eliminar un producto
   const handleDelete = async (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       try {
@@ -130,9 +121,7 @@ const Productos = () => {
   return (
     <div className="container mt-4">
       <h2>Lista de Productos</h2>
-
       {error && <Alert variant="danger">{error}</Alert>}
-
       <Button
         variant="primary"
         onClick={() => setShowModal(true)}
@@ -140,7 +129,6 @@ const Productos = () => {
       >
         Crear Producto
       </Button>
-
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -157,7 +145,7 @@ const Productos = () => {
             <tr key={producto._id}>
               <td>{producto.nombre}</td>
               <td>{producto.descripcion || "N/A"}</td>
-              <td>${producto.precio}</td>
+              <td>${Math.round(producto.precio).toLocaleString('es-CO')}</td> {/* Redondeo y formato */}
               <td>{producto.stock}</td>
               <td>{producto.estado || "activo"}</td>
               <td>
@@ -181,8 +169,6 @@ const Productos = () => {
           ))}
         </tbody>
       </Table>
-
-      {/* Modal para agregar/editar producto */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>
@@ -222,7 +208,7 @@ const Productos = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Stock</Form.Label>
+              <Form.Label>Stock</Label>
               <Form.Control
                 type="number"
                 name="stock"
@@ -252,5 +238,4 @@ const Productos = () => {
     </div>
   );
 };
-
 export default Productos;
