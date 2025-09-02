@@ -14,27 +14,22 @@ const CrearProducto = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Convertir campos numéricos correctamente
     const parsedValue =
       name === "precio" || name === "stock" ? parseFloat(value) || "" : value;
-
     setProducto({ ...producto, [name]: parsedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, precio, stock, categoria } = producto;
-
     if (!nombre || precio === "" || stock === "" || !categoria) {
       alert("⚠️ Todos los campos son obligatorios");
       return;
     }
-
     try {
       await axios.post("/productos", {
         nombre,
-        precio: parseFloat(precio),
+        precio: Math.round(parseFloat(precio)), // Redondea al entero más cercano
         stock: parseInt(stock),
         categoria,
       });
@@ -68,7 +63,6 @@ const CrearProducto = () => {
                 required
               />
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Precio</Form.Label>
               <Form.Control
@@ -79,9 +73,9 @@ const CrearProducto = () => {
                 placeholder="Precio del producto"
                 required
                 min="1"
+                step="1" // Fuerza entrada en enteros
               />
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Stock</Form.Label>
               <Form.Control
@@ -92,9 +86,9 @@ const CrearProducto = () => {
                 placeholder="Cantidad en stock"
                 required
                 min="0"
+                step="1" // Fuerza entrada en enteros
               />
             </Form.Group>
-
             <Form.Group className="mb-4">
               <Form.Label>Categoría</Form.Label>
               <Form.Select
@@ -110,7 +104,6 @@ const CrearProducto = () => {
                 <option value="servicio">Servicio</option>
               </Form.Select>
             </Form.Group>
-
             <div className="d-flex justify-content-between">
               <Button
                 variant="secondary"
@@ -128,5 +121,4 @@ const CrearProducto = () => {
     </div>
   );
 };
-
 export default CrearProducto;
