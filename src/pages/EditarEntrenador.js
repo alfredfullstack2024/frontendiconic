@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
-
-// URL base de la API (ajustada para Vercel o entorno)
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+import api from "../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -25,13 +22,7 @@ const EditarEntrenador = () => {
   useEffect(() => {
     const fetchEntrenador = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `${API_URL}/entrenadores/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await api.get(`/entrenadores/${id}`);
         const data = response.data;
         setEntrenador({
           nombre: data.nombre || "",
@@ -92,12 +83,7 @@ const EditarEntrenador = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `${API_URL}/entrenadores/${id}`,
-        entrenador,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/entrenadores/${id}`, entrenador);
       alert("Entrenador actualizado con éxito");
       navigate("/entrenadores");
     } catch (err) {
@@ -169,7 +155,6 @@ const EditarEntrenador = () => {
             required
           />
         </Form.Group>
-
         {Array.isArray(entrenador.clases) && entrenador.clases.map((clase, claseIndex) => (
           <div key={claseIndex} className="mb-4">
             <h5>Clase {claseIndex + 1}</h5>
@@ -263,7 +248,6 @@ const EditarEntrenador = () => {
             </Button>
           </div>
         ))}
-
         <Button variant="primary" type="submit">
           Actualizar Entrenador
         </Button>
