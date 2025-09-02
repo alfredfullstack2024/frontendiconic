@@ -13,7 +13,6 @@ const EditarProducto = () => {
     categoria: "",
   });
 
-  // Obtener producto por ID al cargar
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
@@ -25,32 +24,27 @@ const EditarProducto = () => {
         navigate("/productos");
       }
     };
-
     obtenerProducto();
   }, [id, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     const parsedValue =
       name === "precio" || name === "stock" ? parseFloat(value) || "" : value;
-
     setProducto({ ...producto, [name]: parsedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { nombre, precio, stock, categoria } = producto;
-
     if (!nombre || precio === "" || stock === "" || !categoria) {
       alert("⚠️ Todos los campos son obligatorios");
       return;
     }
-
     try {
       await axios.put(`/productos/${id}`, {
         nombre,
-        precio: parseFloat(precio),
+        precio: Math.round(parseFloat(precio)), // Redondea al entero más cercano
         stock: parseInt(stock),
         categoria,
       });
@@ -83,7 +77,6 @@ const EditarProducto = () => {
                 required
               />
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Precio</Form.Label>
               <Form.Control
@@ -93,9 +86,9 @@ const EditarProducto = () => {
                 onChange={handleChange}
                 required
                 min="1"
+                step="1" // Fuerza entrada en enteros
               />
             </Form.Group>
-
             <Form.Group className="mb-3">
               <Form.Label>Stock</Form.Label>
               <Form.Control
@@ -105,9 +98,9 @@ const EditarProducto = () => {
                 onChange={handleChange}
                 required
                 min="0"
+                step="1" // Fuerza entrada en enteros
               />
             </Form.Group>
-
             <Form.Group className="mb-4">
               <Form.Label>Categoría</Form.Label>
               <Form.Select
@@ -123,7 +116,6 @@ const EditarProducto = () => {
                 <option value="servicio">Servicio</option>
               </Form.Select>
             </Form.Group>
-
             <div className="d-flex justify-content-between">
               <Button
                 variant="secondary"
@@ -141,5 +133,4 @@ const EditarProducto = () => {
     </div>
   );
 };
-
 export default EditarProducto;
