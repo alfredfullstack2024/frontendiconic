@@ -20,10 +20,10 @@ const CrearPago = () => {
 
   // Configuración del tiquete
   const tiqueteConfig = {
-    nombreEstablecimiento: "Nombre del Gimnasio",
-    direccion: "Carrera 123 # 45 67",
-    telefonos: "350 000 0000 - 350 111 1111",
-    nit: "123456789",
+    nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
+    direccion: "CALLE 2 B No. 69D-58 BOGOTA",
+    telefonos: "3176696551",
+    
   };
 
   // Obtener y actualizar el contador del tiquete desde localStorage
@@ -282,3 +282,4 @@ const CrearPago = () => {
 };
 
 export default CrearPago;
+
