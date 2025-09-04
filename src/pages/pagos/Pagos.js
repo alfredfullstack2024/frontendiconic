@@ -1,309 +1,312 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Table, Button, Alert, Form, Row, Col, Card } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/axios";
+import { obtenerClientes, obtenerProductos, crearPago } from "../../api/axios";
 
-const Pagos = () => {
-  const [pagos, setPagos] = useState([]);
-  const [filtroTipo, setFiltroTipo] = useState("mes");
-  const [mes, setMes] = useState("");
-  const [semana, setSemana] = useState("");
-  const [busquedaNombre, setBusquedaNombre] = useState("");
-  const [pagosFiltrados, setPagosFiltrados] = useState([]);
+const CrearPago = () => {
+  const [clientes, setClientes] = useState([]);
+  const [productos, setProductos] = useState([]);
+  const [formData, setFormData] = useState({
+    cliente: "",
+    producto: "",
+    cantidad: 1,
+    monto: 0,
+    fecha: "",
+    metodoPago: "Efectivo",
+  });
+  const [searchCliente, setSearchCliente] = useState(""); // texto del input
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showTiquete, setShowTiquete] = useState(false);
   const navigate = useNavigate();
 
-  const fetchPagos = useCallback(async () => {
-    setIsLoading(true);
-    setError("");
+  // Configuración del tiquete
+  const tiqueteConfig = {
+    nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
+    direccion: "CALLE 2 B No. 69D-58 BOGOTA",
+    telefonos: "3176696551",
+  };
 
-    try {
-      const params = {};
-      if (filtroTipo === "mes" && mes) {
-        const [year, month] = mes.split("-");
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0);
-        endDate.setHours(23, 59, 59, 999);
-        params.fechaInicio = startDate.toISOString();
-        params.fechaFin = endDate.toISOString();
-      } else if (filtroTipo === "semana" && semana) {
-        const [year, week] = semana.split("-W");
-        const startDate = new Date(year, 0, 1);
-        startDate.setDate(
-          startDate.getDate() + (week - 1) * 7 - startDate.getDay() + 1
-        );
-        const endDate = new Date(startDate);
-        endDate.setDate(endDate.getDate() + 6);
-        endDate.setHours(23, 59, 59, 999);
-        params.fechaInicio = startDate.toISOString();
-        params.fechaFin = endDate.toISOString();
-      }
-
-      console.log("Parámetros enviados a /pagos:", params);
-      const response = await api.get("/pagos", { params });
-      console.log("Respuesta completa del backend (/pagos):", response.data);
-      const fetchedPagos = response.data.pagos || [];
-      setPagos(fetchedPagos);
-
-      const pagosFiltrados = busquedaNombre
-        ? fetchedPagos.filter((pago) => {
-            const nombreCliente = pago.cliente
-              ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-              : "";
-            return nombreCliente.includes(busquedaNombre.toLowerCase());
-          })
-        : fetchedPagos;
-      setPagosFiltrados(pagosFiltrados);
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message;
-      console.error("Error detallado en fetchPagos:", err.response?.data);
-      setError("Error al cargar los pagos: " + errorMessage);
-      setPagos([]);
-      setPagosFiltrados([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filtroTipo, mes, semana, busquedaNombre]);
+  // Obtener y actualizar el contador del tiquete desde localStorage
+  const [ticketNumber, setTicketNumber] = useState(() => {
+    const savedTicketNumber = localStorage.getItem("lastTicketNumber");
+    return savedTicketNumber ? parseInt(savedTicketNumber, 10) + 1 : 1;
+  });
 
   useEffect(() => {
-    fetchPagos();
-  }, [fetchPagos]);
+    const fetchData = async () => {
+      try {
+        const [clientesResponse, productosResponse] = await Promise.all([
+          obtenerClientes(),
+          obtenerProductos(),
+        ]);
+        setClientes(clientesResponse.data);
+        setProductos(productosResponse.data);
 
-  const manejarFiltrar = async (e) => {
+        const today = new Date().toISOString().split("T")[0];
+        setFormData((prev) => ({ ...prev, fecha: today }));
+      } catch (err) {
+        setError("Error al cargar los datos: " + err.message);
+        if (err.message.includes("Sesión expirada")) {
+          navigate("/login");
+        }
+      }
+    };
+    fetchData();
+  }, [navigate]);
+
+  useEffect(() => {
+    const productoSeleccionado = productos.find(
+      (p) => p._id === formData.producto
+    );
+    if (productoSeleccionado) {
+      const monto = productoSeleccionado.precio * formData.cantidad;
+      setFormData((prev) => ({ ...prev, monto }));
+    }
+  }, [formData.producto, formData.cantidad, productos]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "cantidad" ? parseInt(value) || 1 : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setPagos([]);
-    setPagosFiltrados([]);
-    await fetchPagos();
-  };
+    setError("");
 
-  const limpiarFiltros = async () => {
-    setFiltroTipo("mes");
-    setMes("");
-    setSemana("");
-    setBusquedaNombre("");
-    setPagos([]);
-    setPagosFiltrados([]);
-    await fetchPagos();
-  };
+    if (!formData.cliente) {
+      setError("Por favor seleccione un cliente válido.");
+      return;
+    }
 
-  const eliminarPago = async (id) => {
-    if (!window.confirm("¿Estás seguro de que deseas eliminar este pago?")) return;
     try {
-      setIsLoading(true);
-      await api.delete(`/pagos/${id}`);
-      setPagos((prevPagos) => {
-        const nuevosPagos = prevPagos.filter((pago) => pago._id !== id);
-        setPagosFiltrados(
-          busquedaNombre
-            ? nuevosPagos.filter((pago) => {
-                const nombreCliente = pago.cliente
-                  ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-                  : "";
-                return nombreCliente.includes(busquedaNombre.toLowerCase());
-              })
-            : nuevosPagos
-        );
-        return nuevosPagos;
-      });
-      setError("");
+      await crearPago(formData);
+      setShowTiquete(true); // Mostrar tiquete tras registrar
     } catch (err) {
-      setError(
-        "Error al eliminar el pago: " + (err.response?.data?.message || err.message)
-      );
-      await fetchPagos();
-    } finally {
-      setIsLoading(false);
+      setError("Error al registrar el pago: " + err.message);
+      if (err.message.includes("Sesión expirada")) {
+        navigate("/login");
+      }
     }
   };
 
-  const formatFecha = (fecha) => {
-    const date = new Date(fecha);
-    return new Date(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate()
-    ).toLocaleDateString("es-ES");
+  const imprimirTiquete = () => {
+    // Incrementar y guardar el nuevo número de tiquete
+    const newTicketNumber = ticketNumber;
+    localStorage.setItem("lastTicketNumber", newTicketNumber);
+    setTicketNumber(newTicketNumber + 1);
+
+    const printContent = document.getElementById("tiquete").innerHTML;
+    const printWindow = window.open("", "", "height=500,width=300");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Tiquete de Pago</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 10px; }
+            h1 { text-align: center; }
+            p { margin: 0; }
+            .small-text { font-size: 8px; }
+          </style>
+        </head>
+        <body>${printContent}</body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close();
+    setShowTiquete(false); // Ocultar tras imprimir
+    navigate("/pagos"); // Redirigir después de imprimir
   };
 
-  const manejarCambioBusqueda = (e) => {
-    const valor = e.target.value;
-    setBusquedaNombre(valor);
-
-    const pagosFiltrados = valor
-      ? pagos.filter((pago) => {
-          const nombreCliente = pago.cliente
-            ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-            : "";
-          return nombreCliente.includes(valor.toLowerCase());
-        })
-      : pagos;
-    setPagosFiltrados(pagosFiltrados);
-  };
-
-  const esProximoVencimiento = (fecha, productoNombre) => {
-    if (!productoNombre || !productoNombre.toLowerCase().includes("mensualidad")) {
-      return false;
-    }
-
-    const fechaPago = new Date(fecha);
-    const vencimiento = new Date(fechaPago);
-    vencimiento.setDate(vencimiento.getDate() + 30);
-    const hoy = new Date();
-    const diferenciaDias = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
-    return diferenciaDias <= 5 && diferenciaDias > 0;
-  };
+  const fechaFinal = new Date(formData.fecha);
+  fechaFinal.setMonth(fechaFinal.getMonth() + 1);
 
   return (
     <div className="container mt-4">
-      <h2>Pagos</h2>
+      <h2>Registrar Pago</h2>
+
       {error && <Alert variant="danger">{error}</Alert>}
-      <Card className="mb-4">
+
+      <Card>
         <Card.Body>
-          <Card.Title>Filtrar y Buscar</Card.Title>
-          <Form onSubmit={manejarFiltrar}>
-            <Row>
-              <Col md={3}>
-                <Form.Group controlId="filtroTipo">
-                  <Form.Label>Tipo de Filtro</Form.Label>
-                  <Form.Select
-                    value={filtroTipo}
-                    onChange={(e) => setFiltroTipo(e.target.value)}
-                    disabled={isLoading}
-                  >
-                    <option value="mes">Mes</option>
-                    <option value="semana">Semana</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-              {filtroTipo === "mes" ? (
-                <Col md={3}>
-                  <Form.Group controlId="mes">
-                    <Form.Label>Mes</Form.Label>
-                    <Form.Control
-                      type="month"
-                      value={mes}
-                      onChange={(e) => setMes(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </Form.Group>
-                </Col>
-              ) : (
-                <Col md={3}>
-                  <Form.Group controlId="semana">
-                    <Form.Label>Semana</Form.Label>
-                    <Form.Control
-                      type="week"
-                      value={semana}
-                      onChange={(e) => setSemana(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </Form.Group>
-                </Col>
-              )}
-              <Col md={3}>
-                <Form.Group controlId="busquedaNombre">
-                  <Form.Label>Buscar por Nombre</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={busquedaNombre}
-                    onChange={manejarCambioBusqueda}
-                    placeholder="Nombre completo del cliente"
-                    disabled={isLoading}
+          <Form onSubmit={handleSubmit}>
+            {/* CLIENTE con datalist */}
+            <Form.Group className="mb-3" controlId="cliente">
+              <Form.Label>Cliente</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Buscar cliente por nombre o apellido"
+                value={searchCliente}
+                onChange={(e) => {
+                  const valor = e.target.value;
+                  setSearchCliente(valor);
+
+                  // Buscar si coincide exactamente con un cliente
+                  const seleccionado = clientes.find(
+                    (c) =>
+                      `${c.nombre} ${c.apellido}`.toLowerCase() ===
+                      valor.toLowerCase()
+                  );
+
+                  if (seleccionado) {
+                    setFormData((prev) => ({ ...prev, cliente: seleccionado._id }));
+                  } else {
+                    setFormData((prev) => ({ ...prev, cliente: "" }));
+                  }
+                }}
+                list="clientes-list"
+              />
+              <datalist id="clientes-list">
+                {clientes.map((cliente) => (
+                  <option
+                    key={cliente._id}
+                    value={`${cliente.nombre} ${cliente.apellido}`}
                   />
-                </Form.Group>
-              </Col>
-              <Col md={3} className="d-flex align-items-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="me-2"
-                  disabled={isLoading}
-                >
-                  Filtrar
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={limpiarFiltros}
-                  disabled={isLoading}
-                >
-                  Limpiar
-                </Button>
-              </Col>
-            </Row>
+                ))}
+              </datalist>
+            </Form.Group>
+
+            {/* PRODUCTO */}
+            <Form.Group className="mb-3" controlId="producto">
+              <Form.Label>Producto (opcional)</Form.Label>
+              <Form.Control
+                as="select"
+                name="producto"
+                value={formData.producto}
+                onChange={handleChange}
+              >
+                <option value="">Seleccione un producto</option>
+                {productos.map((producto) => (
+                  <option key={producto._id} value={producto._id}>
+                    {producto.nombre} - ${producto.precio} ({producto.stock} en stock)
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            {/* CANTIDAD */}
+            <Form.Group className="mb-3" controlId="cantidad">
+              <Form.Label>Cantidad</Form.Label>
+              <Form.Control
+                type="number"
+                name="cantidad"
+                value={formData.cantidad}
+                onChange={handleChange}
+                min="1"
+              />
+            </Form.Group>
+
+            {/* MONTO */}
+            <Form.Group className="mb-3" controlId="monto">
+              <Form.Label>Monto</Form.Label>
+              <Form.Control type="number" value={formData.monto} readOnly />
+            </Form.Group>
+
+            {/* FECHA */}
+            <Form.Group className="mb-3" controlId="fecha">
+              <Form.Label>Fecha</Form.Label>
+              <Form.Control
+                type="date"
+                name="fecha"
+                value={formData.fecha}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+
+            {/* MÉTODO DE PAGO */}
+            <Form.Group className="mb-3" controlId="metodoPago">
+              <Form.Label>Método de pago</Form.Label>
+              <Form.Control
+                as="select"
+                name="metodoPago"
+                value={formData.metodoPago}
+                onChange={handleChange}
+              >
+                <option value="Efectivo">Efectivo</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Transferencia">Transferencia</option>
+              </Form.Control>
+            </Form.Group>
+
+            <Button variant="primary" type="submit">
+              Registrar Pago
+            </Button>
+            <Button
+              variant="secondary"
+              className="ms-2"
+              onClick={() => navigate("/pagos")}
+            >
+              Cancelar
+            </Button>
           </Form>
-        </Card.Body>
-      </Card>
-      <Button
-        variant="primary"
-        className="mb-3"
-        onClick={() => navigate("/pagos/crear")}
-        disabled={isLoading}
-      >
-        Crear pago
-      </Button>
-      {isLoading && <Alert variant="info">Cargando pagos...</Alert>}
-      {!isLoading && pagosFiltrados.length === 0 && !error && (
-        <Alert variant="info">No hay pagos para mostrar.</Alert>
-      )}
-      {!isLoading && pagosFiltrados.length > 0 && (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Monto</th>
-              <th>Fecha</th>
-              <th>Producto</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagosFiltrados.map((pago) => (
-              <tr
-                key={pago._id}
+
+          {showTiquete && (
+            <div>
+              <div
+                id="tiquete"
                 style={{
-                  backgroundColor: esProximoVencimiento(
-                    pago.fecha,
-                    pago.producto?.nombre
-                  )
-                    ? "#ffcccc"
-                    : "transparent",
+                  width: "300px",
+                  fontFamily: "Arial, sans-serif",
+                  padding: "10px",
+                  border: "1px solid #000",
+                  marginTop: "20px",
                 }}
               >
-                <td>
-                  {pago.cliente
-                    ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`
-                    : "Cliente no encontrado"}
-                </td>
-                <td>${pago.monto.toLocaleString()}</td>
-                <td>{formatFecha(pago.fecha)}</td>
-                <td>{pago.producto?.nombre || "Producto no especificado"}</td>
-                <td>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => navigate(`/pagos/editar/${pago._id}`)}
-                    disabled={isLoading}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => eliminarPago(pago._id)}
-                    disabled={isLoading}
-                  >
-                    Eliminar
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+                <h1 style={{ textAlign: "center" }}>
+                  {tiqueteConfig.nombreEstablecimiento}
+                </h1>
+                <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
+                <p style={{ textAlign: "center" }}>
+                  Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
+                </p>
+                <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
+                <p>Recibo #: {ticketNumber}</p>
+                <p>
+                  Cliente:{" "}
+                  {clientes.find((c) => c._id === formData.cliente)?.nombre ||
+                    "No especificado"}
+                </p>
+                <h3>Mensualidad Gym 2025</h3>
+                <p>Fecha Inicio: {formData.fecha}</p>
+                <p>Fecha Final: {fechaFinal.toLocaleDateString("es-CO")}</p>
+                <p>
+                  Pago:{" "}
+                  {formData.monto.toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                  })}
+                </p>
+                <p>Saldo: 0.00</p>
+                <p>Forma Pago: {formData.metodoPago}</p>
+                <p style={{ fontSize: "8px" }}>
+                  Mensualidad Intransferible, No Congelable, No Se Hace
+                  Devolución de Dinero
+                </p>
+              </div>
+              <Button
+                variant="primary"
+                className="mt-2"
+                onClick={imprimirTiquete}
+              >
+                Imprimir Tiquete
+              </Button>
+              <Button
+                variant="secondary"
+                className="ms-2 mt-2"
+                onClick={() => setShowTiquete(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
     </div>
   );
 };
 
-export default Pagos;
+export default CrearPago;
