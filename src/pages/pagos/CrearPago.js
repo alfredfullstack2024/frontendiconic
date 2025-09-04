@@ -14,6 +14,7 @@ const CrearPago = () => {
     fecha: "",
     metodoPago: "Efectivo",
   });
+  const [searchCliente, setSearchCliente] = useState(""); // lo que escribe el usuario
   const [error, setError] = useState("");
   const [showTiquete, setShowTiquete] = useState(false);
   const navigate = useNavigate();
@@ -76,6 +77,11 @@ const CrearPago = () => {
     setError("");
 
     try {
+      if (!formData.cliente) {
+        setError("Por favor seleccione un cliente válido.");
+        return;
+      }
+
       await crearPago(formData);
       setShowTiquete(true); // Mostrar tiquete tras registrar
     } catch (err) {
@@ -126,37 +132,37 @@ const CrearPago = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-            {/* CAMBIO: Input con búsqueda en vez de select */}
+            {/* CAMBIO: Input con búsqueda */}
             <Form.Group className="mb-3" controlId="cliente">
               <Form.Label>Cliente</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Buscar cliente por nombre o apellido"
-                value={
-                  clientes.find((c) => c._id === formData.cliente)
-                    ? `${clientes.find((c) => c._id === formData.cliente).nombre} ${clientes.find((c) => c._id === formData.cliente).apellido}`
-                    : ""
-                }
+                value={searchCliente}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase();
-                  const clienteEncontrado = clientes.find(
-                    (c) =>
-                      `${c.nombre} ${c.apellido}`
-                        .toLowerCase()
-                        .includes(value)
-                  );
-                  if (clienteEncontrado) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      cliente: clienteEncontrado._id,
-                    }));
-                  } else {
-                    setFormData((prev) => ({ ...prev, cliente: "" }));
-                  }
+                  setSearchCliente(e.target.value);
+                  setFormData((prev) => ({ ...prev, cliente: "" }));
                 }}
                 list="clientes-list"
               />
-              <datalist id="clientes-list">
+              <datalist
+                id="clientes-list"
+                onClick={(e) => {
+                  const seleccionado = clientes.find(
+                    (c) =>
+                      `${c.nombre} ${c.apellido}` === e.target.value
+                  );
+                  if (seleccionado) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      cliente: seleccionado._id,
+                    }));
+                    setSearchCliente(
+                      `${seleccionado.nombre} ${seleccionado.apellido}`
+                    );
+                  }
+                }}
+              >
                 {clientes.map((cliente) => (
                   <option
                     key={cliente._id}
