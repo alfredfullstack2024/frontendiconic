@@ -14,7 +14,7 @@ const CrearPago = () => {
     fecha: "",
     metodoPago: "Efectivo",
   });
-  const [searchCliente, setSearchCliente] = useState(""); // lo que escribe el usuario
+  const [searchCliente, setSearchCliente] = useState(""); // búsqueda por nombre
   const [error, setError] = useState("");
   const [showTiquete, setShowTiquete] = useState(false);
   const navigate = useNavigate();
@@ -24,6 +24,7 @@ const CrearPago = () => {
     nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
     direccion: "CALLE 2 B No. 69D-58 BOGOTA",
     telefonos: "3176696551",
+    nit: "000000000-0",
   };
 
   // Obtener y actualizar el contador del tiquete desde localStorage
@@ -76,12 +77,12 @@ const CrearPago = () => {
     e.preventDefault();
     setError("");
 
-    try {
-      if (!formData.cliente) {
-        setError("Por favor seleccione un cliente válido.");
-        return;
-      }
+    if (!formData.cliente) {
+      setError("Por favor seleccione un cliente válido.");
+      return;
+    }
 
+    try {
       await crearPago(formData);
       setShowTiquete(true); // Mostrar tiquete tras registrar
     } catch (err) {
@@ -93,6 +94,7 @@ const CrearPago = () => {
   };
 
   const imprimirTiquete = () => {
+    // Incrementar y guardar el nuevo número de tiquete
     const newTicketNumber = ticketNumber;
     localStorage.setItem("lastTicketNumber", newTicketNumber);
     setTicketNumber(newTicketNumber + 1);
@@ -116,8 +118,8 @@ const CrearPago = () => {
     printWindow.document.close();
     printWindow.print();
     printWindow.close();
-    setShowTiquete(false);
-    navigate("/pagos");
+    setShowTiquete(false); // Ocultar tras imprimir
+    navigate("/pagos"); // Redirigir después de imprimir
   };
 
   const fechaFinal = new Date(formData.fecha);
@@ -132,7 +134,7 @@ const CrearPago = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-            {/* CAMBIO: Input con búsqueda */}
+            {/* CLIENTE con búsqueda */}
             <Form.Group className="mb-3" controlId="cliente">
               <Form.Label>Cliente</Form.Label>
               <Form.Control
@@ -140,29 +142,28 @@ const CrearPago = () => {
                 placeholder="Buscar cliente por nombre o apellido"
                 value={searchCliente}
                 onChange={(e) => {
-                  setSearchCliente(e.target.value);
-                  setFormData((prev) => ({ ...prev, cliente: "" }));
-                }}
-                list="clientes-list"
-              />
-              <datalist
-                id="clientes-list"
-                onClick={(e) => {
+                  const valor = e.target.value;
+                  setSearchCliente(valor);
+
+                  // Validar coincidencia exacta
                   const seleccionado = clientes.find(
                     (c) =>
-                      `${c.nombre} ${c.apellido}` === e.target.value
+                      `${c.nombre} ${c.apellido}`.toLowerCase() ===
+                      valor.toLowerCase()
                   );
+
                   if (seleccionado) {
                     setFormData((prev) => ({
                       ...prev,
                       cliente: seleccionado._id,
                     }));
-                    setSearchCliente(
-                      `${seleccionado.nombre} ${seleccionado.apellido}`
-                    );
+                  } else {
+                    setFormData((prev) => ({ ...prev, cliente: "" }));
                   }
                 }}
-              >
+                list="clientes-list"
+              />
+              <datalist id="clientes-list">
                 {clientes.map((cliente) => (
                   <option
                     key={cliente._id}
@@ -172,9 +173,9 @@ const CrearPago = () => {
               </datalist>
             </Form.Group>
 
-            {/* Producto */}
+            {/* PRODUCTO */}
             <Form.Group className="mb-3" controlId="producto">
-              <Form.Label>Producto</Form.Label>
+              <Form.Label>Producto (opcional)</Form.Label>
               <Form.Control
                 as="select"
                 name="producto"
@@ -190,6 +191,7 @@ const CrearPago = () => {
               </Form.Control>
             </Form.Group>
 
+            {/* CANTIDAD */}
             <Form.Group className="mb-3" controlId="cantidad">
               <Form.Label>Cantidad</Form.Label>
               <Form.Control
@@ -201,11 +203,13 @@ const CrearPago = () => {
               />
             </Form.Group>
 
+            {/* MONTO */}
             <Form.Group className="mb-3" controlId="monto">
               <Form.Label>Monto</Form.Label>
               <Form.Control type="number" value={formData.monto} readOnly />
             </Form.Group>
 
+            {/* FECHA */}
             <Form.Group className="mb-3" controlId="fecha">
               <Form.Label>Fecha</Form.Label>
               <Form.Control
@@ -217,6 +221,7 @@ const CrearPago = () => {
               />
             </Form.Group>
 
+            {/* MÉTODO DE PAGO */}
             <Form.Group className="mb-3" controlId="metodoPago">
               <Form.Label>Método de pago</Form.Label>
               <Form.Control
@@ -260,7 +265,7 @@ const CrearPago = () => {
                 </h1>
                 <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
                 <p style={{ textAlign: "center" }}>
-                  Tel: {tiqueteConfig.telefonos}
+                  Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
                 </p>
                 <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
                 <p>Recibo #: {ticketNumber}</p>
