@@ -1,7 +1,8 @@
-  import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { obtenerClientes, obtenerProductos, crearPago } from "../../api/axios";
+import Select from "react-select";
 
 const CrearPago = () => {
   const [clientes, setClientes] = useState([]);
@@ -21,9 +22,8 @@ const CrearPago = () => {
   // Configuración del tiquete
   const tiqueteConfig = {
     nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
-    direccion: "CALLE 2 B No. 69D-58 BOGOTA",
+    direccion: "CALLE 2 B No. 69D-58 BOGOTA",
     telefonos: "3176696551",
-    
   };
 
   // Obtener y actualizar el contador del tiquete desde localStorage
@@ -88,7 +88,6 @@ const CrearPago = () => {
   };
 
   const imprimirTiquete = () => {
-    // Incrementar y guardar el nuevo número de tiquete
     const newTicketNumber = ticketNumber;
     localStorage.setItem("lastTicketNumber", newTicketNumber);
     setTicketNumber(newTicketNumber + 1);
@@ -112,8 +111,8 @@ const CrearPago = () => {
     printWindow.document.close();
     printWindow.print();
     printWindow.close();
-    setShowTiquete(false); // Ocultar tras imprimir
-    navigate("/pagos"); // Redirigir después de imprimir
+    setShowTiquete(false);
+    navigate("/pagos");
   };
 
   const fechaFinal = new Date(formData.fecha);
@@ -128,23 +127,34 @@ const CrearPago = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
+            {/* Cliente con autocompletado */}
             <Form.Group className="mb-3" controlId="cliente">
               <Form.Label>Cliente (opcional)</Form.Label>
-              <Form.Control
-                as="select"
-                name="cliente"
-                value={formData.cliente}
-                onChange={handleChange}
-              >
-                <option value="">Seleccione un cliente</option>
-                {clientes.map((cliente) => (
-                  <option key={cliente._id} value={cliente._id}>
-                    {cliente.nombre} {cliente.apellido}
-                  </option>
-                ))}
-              </Form.Control>
+              <Select
+                options={clientes.map((cliente) => ({
+                  value: cliente._id,
+                  label: `${cliente.nombre} ${cliente.apellido}`,
+                }))}
+                value={
+                  clientes
+                    .map((c) => ({
+                      value: c._id,
+                      label: `${c.nombre} ${c.apellido}`,
+                    }))
+                    .find((option) => option.value === formData.cliente) || null
+                }
+                onChange={(selectedOption) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    cliente: selectedOption ? selectedOption.value : "",
+                  }))
+                }
+                placeholder="Escriba para buscar cliente..."
+                isClearable
+              />
             </Form.Group>
 
+            {/* Producto normal */}
             <Form.Group className="mb-3" controlId="producto">
               <Form.Label>Producto (opcional)</Form.Label>
               <Form.Control
@@ -233,7 +243,7 @@ const CrearPago = () => {
                 </h1>
                 <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
                 <p style={{ textAlign: "center" }}>
-                  Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
+                  Tel: {tiqueteConfig.telefonos}
                 </p>
                 <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
                 <p>Recibo #: {ticketNumber}</p>
@@ -282,4 +292,3 @@ const CrearPago = () => {
 };
 
 export default CrearPago;
-
