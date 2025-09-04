@@ -24,6 +24,7 @@ const CrearPago = () => {
     nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
     direccion: "CALLE 2 B No. 69D-58 BOGOTA",
     telefonos: "3176696551",
+    nit: "000000000-0", // puedes cambiarlo si lo tienes en BD
   };
 
   // Obtener y actualizar el contador del tiquete desde localStorage
@@ -152,7 +153,10 @@ const CrearPago = () => {
                   );
 
                   if (seleccionado) {
-                    setFormData((prev) => ({ ...prev, cliente: seleccionado._id }));
+                    setFormData((prev) => ({
+                      ...prev,
+                      cliente: seleccionado._id,
+                    }));
                   } else {
                     setFormData((prev) => ({ ...prev, cliente: "" }));
                   }
