@@ -89,11 +89,11 @@ const DashboardLayout = () => {
       >
         <div className="text-center mb-4">
           <img
-            src="/logo.png"
-            alt="Logo"
-            style={{ width: "150px", marginBottom: "10px" }}
+            src="https://raw.githubusercontent.com/alfredfullstack2024/alfredfullstack.com/main/images/LOGOICONIC.jpg"
+            alt="Logo Iconic"
+            style={{ width: "150px", marginBottom: "10px", objectFit: "contain" }}
           />
-          <h5>Admin Gimnasios</h5>
+          <h5>Admin Escuela</h5>
         </div>
         <Nav className="flex-column">
           {userMenu.map((item, index) => (
