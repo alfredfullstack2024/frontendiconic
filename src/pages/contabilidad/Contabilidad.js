@@ -13,9 +13,10 @@ const Contabilidad = () => {
   const [mes, setMes] = useState("");
   const [semana, setSemana] = useState("");
   const [tipoTransaccion, setTipoTransaccion] = useState("");
+  const [metodoPago, setMetodoPago] = useState(""); // 🔹 Nuevo estado para filtro por método de pago
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [hasInitialLoad, setHasInitialLoad] = useState(false); // Bandera para la primera carga exitosa
+  const [hasInitialLoad, setHasInitialLoad] = useState(false);
   const navigate = useNavigate();
 
   const fetchTransacciones = useCallback(async () => {
@@ -48,15 +49,18 @@ const Contabilidad = () => {
         params.tipo = tipoTransaccion;
       }
 
-      console.log("Parámetros enviados a obtenerTransacciones:", params); // Depuración
+      if (metodoPago) {
+        params.metodoPago = metodoPago; // 🔹 Enviamos método de pago al backend
+      }
+
+      console.log("Parámetros enviados a obtenerTransacciones:", params);
       const response = await obtenerTransacciones(params);
-      console.log("Respuesta del backend:", response.data); // Depuración
+
       const fetchedTransacciones = response.data.transacciones || [];
       const ingresos = response.data.totalIngresos || 0;
       const egresos = response.data.totalEgresos || 0;
       const balanceCalc = response.data.balance || 0;
 
-      console.log("Valores asignados:", { ingresos, egresos, balanceCalc }); // Depuración
       setTransacciones(fetchedTransacciones);
       setTotalIngresos(ingresos);
       setTotalEgresos(egresos);
@@ -64,7 +68,7 @@ const Contabilidad = () => {
       setHasInitialLoad(true);
     } catch (err) {
       const errorMessage = err.message || "Error desconocido";
-      console.error("Error en fetchTransacciones:", err); // Depuración
+      console.error("Error en fetchTransacciones:", err);
       setError("Error al cargar las transacciones: " + errorMessage);
       if (!hasInitialLoad) {
         setTransacciones([]);
@@ -75,11 +79,11 @@ const Contabilidad = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [filtroTipo, mes, semana, tipoTransaccion, hasInitialLoad]);
+  }, [filtroTipo, mes, semana, tipoTransaccion, metodoPago, hasInitialLoad]);
 
   useEffect(() => {
     fetchTransacciones();
-  }, [fetchTransacciones]); // Actualiza cuando cambian las dependencias
+  }, [fetchTransacciones]);
 
   const manejarFiltrar = async (e) => {
     e.preventDefault();
@@ -91,6 +95,7 @@ const Contabilidad = () => {
     setMes("");
     setSemana("");
     setTipoTransaccion("");
+    setMetodoPago(""); // 🔹 Limpiamos también el método de pago
     await fetchTransacciones();
   };
 
@@ -105,14 +110,8 @@ const Contabilidad = () => {
 
   const exportarAExcel = () => {
     const datosResumen = [
-      {
-        Descripción: "Total Ingresos",
-        Monto: `$${totalIngresos.toLocaleString()}`,
-      },
-      {
-        Descripción: "Total Egresos",
-        Monto: `$${totalEgresos.toLocaleString()}`,
-      },
+      { Descripción: "Total Ingresos", Monto: `$${totalIngresos.toLocaleString()}` },
+      { Descripción: "Total Egresos", Monto: `$${totalEgresos.toLocaleString()}` },
       { Descripción: "Balance", Monto: `$${balance.toLocaleString()}` },
       {},
     ];
@@ -125,6 +124,7 @@ const Contabilidad = () => {
       "Cuenta Débito": transaccion.cuentaDebito,
       "Cuenta Crédito": transaccion.cuentaCredito,
       Referencia: transaccion.referencia,
+      "Método de Pago": transaccion.metodoPago || "No especificado", // 🔹 Exportamos también método de pago
       "Creado Por": transaccion.creadoPor?.nombre || "Desconocido",
     }));
 
@@ -201,20 +201,26 @@ const Contabilidad = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
-              <Col md={3} className="d-flex align-items-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="me-2"
-                  disabled={isLoading}
-                >
+              <Col md={3}>
+                <Form.Group controlId="metodoPago">
+                  <Form.Label>Método de Pago</Form.Label>
+                  <Form.Select
+                    value={metodoPago}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                    disabled={isLoading}
+                  >
+                    <option value="">Todos</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="transferencia">Transferencia</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={12} className="d-flex justify-content-end mt-3">
+                <Button type="submit" variant="primary" className="me-2" disabled={isLoading}>
                   Filtrar
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={limpiarFiltros}
-                  disabled={isLoading}
-                >
+                <Button variant="secondary" onClick={limpiarFiltros} disabled={isLoading}>
                   Limpiar
                 </Button>
               </Col>
@@ -222,6 +228,7 @@ const Contabilidad = () => {
           </Form>
         </Card.Body>
       </Card>
+
       <Card className="mb-4">
         <Card.Body>
           <Row>
@@ -246,15 +253,11 @@ const Contabilidad = () => {
             <>
               <p>
                 <strong>Total Ingresos:</strong>{" "}
-                {totalIngresos > 0
-                  ? `$${totalIngresos.toLocaleString()}`
-                  : "No hay ingresos registrados"}
+                {totalIngresos > 0 ? `$${totalIngresos.toLocaleString()}` : "No hay ingresos registrados"}
               </p>
               <p>
                 <strong>Total Egresos:</strong>{" "}
-                {totalEgresos > 0
-                  ? `$${totalEgresos.toLocaleString()}`
-                  : "No hay egresos registrados"}
+                {totalEgresos > 0 ? `$${totalEgresos.toLocaleString()}` : "No hay egresos registrados"}
               </p>
               <p>
                 <strong>Balance:</strong>{" "}
@@ -264,6 +267,7 @@ const Contabilidad = () => {
           )}
         </Card.Body>
       </Card>
+
       <Button
         variant="primary"
         className="mb-3"
@@ -272,6 +276,7 @@ const Contabilidad = () => {
       >
         Registrar Nueva Transacción
       </Button>
+
       {isLoading && <Alert variant="info">Cargando transacciones...</Alert>}
       {!isLoading && transacciones.length === 0 && !error && (
         <Alert variant="info">No hay transacciones para mostrar.</Alert>
@@ -287,6 +292,7 @@ const Contabilidad = () => {
               <th>Cuenta Débito</th>
               <th>Cuenta Crédito</th>
               <th>Referencia</th>
+              <th>Método de Pago</th> {/* 🔹 Nueva columna */}
               <th>Creado Por</th>
             </tr>
           </thead>
@@ -300,6 +306,7 @@ const Contabilidad = () => {
                 <td>{transaccion.cuentaDebito}</td>
                 <td>{transaccion.cuentaCredito}</td>
                 <td>{transaccion.referencia}</td>
+                <td>{transaccion.metodoPago || "No especificado"}</td>
                 <td>{transaccion.creadoPor?.nombre || "Desconocido"}</td>
               </tr>
             ))}
