@@ -14,7 +14,7 @@ const Contabilidad = () => {
   const [mes, setMes] = useState("");
   const [semana, setSemana] = useState("");
   const [tipoTransaccion, setTipoTransaccion] = useState("");
-  const [metodoPago, setMetodoPago] = useState(""); // ⬅️ nuevo estado
+  const [metodoPago, setMetodoPago] = useState("");
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,19 +49,25 @@ const Contabilidad = () => {
 
       if (tipoTransaccion) params.tipo = tipoTransaccion;
       if (metodoPago && metodoPago !== "Todos") {
-        params.metodoPago = metodoPago; // ⬅️ enviamos el método al backend
+        params.metodoPago = metodoPago;
       }
 
       const response = await obtenerTransacciones(params);
       const fetchedTransacciones = response.data.transacciones || [];
-      const ingresos = response.data.totalIngresos || 0;
-      const egresos = response.data.totalEgresos || 0;
-      const balanceCalc = response.data.balance || 0;
+
+      // calcular totales con base en los pagos reales
+      const ingresos = fetchedTransacciones
+        .filter((t) => t.tipo === "ingreso" || t.estado === "Completado")
+        .reduce((acc, t) => acc + (t.monto || 0), 0);
+
+      const egresos = fetchedTransacciones
+        .filter((t) => t.tipo === "egreso")
+        .reduce((acc, t) => acc + (t.monto || 0), 0);
 
       setTransacciones(fetchedTransacciones);
       setTotalIngresos(ingresos);
       setTotalEgresos(egresos);
-      setBalance(balanceCalc);
+      setBalance(ingresos - egresos);
       setHasInitialLoad(true);
     } catch (err) {
       const errorMessage = err.message || "Error desconocido";
@@ -91,7 +97,7 @@ const Contabilidad = () => {
     setMes("");
     setSemana("");
     setTipoTransaccion("");
-    setMetodoPago(""); // ⬅️ limpiamos también el método
+    setMetodoPago("");
     await fetchTransacciones();
   };
 
@@ -106,27 +112,19 @@ const Contabilidad = () => {
 
   const exportarAExcel = () => {
     const datosResumen = [
-      {
-        Descripción: "Total Ingresos",
-        Monto: `$${totalIngresos.toLocaleString()}`,
-      },
-      {
-        Descripción: "Total Egresos",
-        Monto: `$${totalEgresos.toLocaleString()}`,
-      },
+      { Descripción: "Total Ingresos", Monto: `$${totalIngresos.toLocaleString()}` },
+      { Descripción: "Total Egresos", Monto: `$${totalEgresos.toLocaleString()}` },
       { Descripción: "Balance", Monto: `$${balance.toLocaleString()}` },
       {},
     ];
 
-    const datosTransacciones = transacciones.map((transaccion) => ({
-      Tipo: transaccion.tipo === "ingreso" ? "Ingreso" : "Egreso",
-      Descripción: transaccion.descripcion,
-      Monto: `$${transaccion.monto.toLocaleString()}`,
-      Fecha: formatFecha(transaccion.fecha),
-      "Cuenta Débito": transaccion.cuentaDebito,
-      "Cuenta Crédito": transaccion.cuentaCredito,
-      Referencia: transaccion.referencia,
-      "Creado Por": transaccion.creadoPor?.nombre || "Desconocido",
+    const datosTransacciones = transacciones.map((t) => ({
+      Cliente: t.cliente?.nombre || t.cliente || "N/A",
+      Producto: t.producto?.nombre || t.producto || "N/A",
+      Monto: `$${t.monto?.toLocaleString()}`,
+      Fecha: formatFecha(t.fecha),
+      "Método de Pago": t.metodoPago,
+      Estado: t.estado,
     }));
 
     const datosCompletos = [...datosResumen, ...datosTransacciones];
@@ -146,11 +144,13 @@ const Contabilidad = () => {
       <h2>Contabilidad</h2>
       {error && <Alert variant="danger">{error}</Alert>}
 
+      {/* Filtros */}
       <Card className="mb-4">
         <Card.Body>
           <Card.Title>Filtrar Transacciones</Card.Title>
           <Form onSubmit={manejarFiltrar}>
             <Row>
+              {/* filtro por mes/semana */}
               <Col md={3}>
                 <Form.Group controlId="filtroTipo">
                   <Form.Label>Tipo de Filtro</Form.Label>
@@ -168,7 +168,7 @@ const Contabilidad = () => {
               {filtroTipo === "mes" ? (
                 <Col md={3}>
                   <Form.Group controlId="mes">
-                    <Form.Label>Yo</Form.Label>
+                    <Form.Label>Mes</Form.Label>
                     <Form.Control
                       type="month"
                       value={mes}
@@ -180,7 +180,7 @@ const Contabilidad = () => {
               ) : (
                 <Col md={3}>
                   <Form.Group controlId="semana">
-                    <Form.Label>Yo</Form.Label>
+                    <Form.Label>Semana</Form.Label>
                     <Form.Control
                       type="week"
                       value={semana}
@@ -191,6 +191,7 @@ const Contabilidad = () => {
                 </Col>
               )}
 
+              {/* tipo de transacción */}
               <Col md={3}>
                 <Form.Group controlId="tipoTransaccion">
                   <Form.Label>Tipo de transacción</Form.Label>
@@ -206,6 +207,7 @@ const Contabilidad = () => {
                 </Form.Group>
               </Col>
 
+              {/* método de pago */}
               <Col md={3}>
                 <Form.Group controlId="metodoPago">
                   <Form.Label>Método de pago</Form.Label>
@@ -223,19 +225,10 @@ const Contabilidad = () => {
               </Col>
 
               <Col md={12} className="d-flex align-items-end mt-3">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  className="me-2"
-                  disabled={isLoading}
-                >
+                <Button type="submit" variant="primary" className="me-2" disabled={isLoading}>
                   Filtrar
                 </Button>
-                <Button
-                  variant="secondary"
-                  onClick={limpiarFiltros}
-                  disabled={isLoading}
-                >
+                <Button variant="secondary" onClick={limpiarFiltros} disabled={isLoading}>
                   Limpiar
                 </Button>
               </Col>
@@ -244,6 +237,7 @@ const Contabilidad = () => {
         </Card.Body>
       </Card>
 
+      {/* Resumen */}
       <Card className="mb-4">
         <Card.Body>
           <Row>
@@ -261,42 +255,31 @@ const Contabilidad = () => {
             </Col>
           </Row>
 
-          {isLoading ? (
-            <p>Cargando resumen...</p>
-          ) : error ? (
-            <p>Error al cargar el resumen.</p>
-          ) : (
-            <>
-              <p>
-                <strong>Ingresos totales:</strong>{" "}
-                {totalIngresos > 0
-                  ? `$${totalIngresos.toLocaleString()}`
-                  : "No hay ingresos registrados"}
-              </p>
-              <p>
-                <strong>Egresos totales:</strong>{" "}
-                {totalEgresos > 0
-                  ? `$${totalEgresos.toLocaleString()}`
-                  : "No hay egresos registrados"}
-              </p>
-              <p>
-                <strong>Saldo:</strong>{" "}
-                {`${(totalIngresos - totalEgresos).toLocaleString()}`}
-              </p>
-            </>
-          )}
+          <p>
+            <strong>Ingresos totales:</strong>{" "}
+            {totalIngresos > 0 ? `$${totalIngresos.toLocaleString()}` : "No hay ingresos registrados"}
+          </p>
+          <p>
+            <strong>Egresos totales:</strong>{" "}
+            {totalEgresos > 0 ? `$${totalEgresos.toLocaleString()}` : "No hay egresos registrados"}
+          </p>
+          <p>
+            <strong>Saldo:</strong> {`${balance.toLocaleString()}`}
+          </p>
         </Card.Body>
       </Card>
 
+      {/* botón registrar */}
       <Button
         variant="primary"
         className="mb-3"
         onClick={() => navigate("/contabilidad/crear-transaccion")}
         disabled={isLoading}
       >
-        Registrador Nueva Transacción
+        Registrar Nueva Transacción
       </Button>
 
+      {/* Tabla */}
       {isLoading && <Alert variant="info">Cargando transacciones...</Alert>}
       {!isLoading && transacciones.length === 0 && !error && (
         <Alert variant="info">No hay transacciones para mostrar.</Alert>
@@ -306,27 +289,23 @@ const Contabilidad = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Tipo</th>
-              <th>Descripción</th>
+              <th>Cliente</th>
+              <th>Producto</th>
               <th>Monto</th>
               <th>Fecha</th>
-              <th>Cuenta Débito</th>
-              <th>Cuenta de Crédito</th>
-              <th>Referencia</th>
-              <th>Creado Por</th>
+              <th>Método de Pago</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
-            {transacciones.map((transaccion) => (
-              <tr key={transaccion._id}>
-                <td>{transaccion.tipo === "ingreso" ? "Ingreso" : "Egreso"}</td>
-                <td>{transaccion.descripcion}</td>
-                <td>${transaccion.monto.toLocaleString()}</td>
-                <td>{formatFecha(transaccion.fecha)}</td>
-                <td>{transaccion.cuentaDebito}</td>
-                <td>{transaccion.cuentaCredito}</td>
-                <td>{transaccion.referencia}</td>
-                <td>{transaccion.creadoPor?.nombre || "Desconocido"}</td>
+            {transacciones.map((t) => (
+              <tr key={t._id}>
+                <td>{t.cliente?.nombre || t.cliente || "N/A"}</td>
+                <td>{t.producto?.nombre || t.producto || "N/A"}</td>
+                <td>${t.monto?.toLocaleString()}</td>
+                <td>{formatFecha(t.fecha)}</td>
+                <td>{t.metodoPago}</td>
+                <td>{t.estado}</td>
               </tr>
             ))}
           </tbody>
