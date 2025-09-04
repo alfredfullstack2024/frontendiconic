@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { obtenerClientes, obtenerProductos, crearPago } from "../../api/axios";
-import Select from "react-select";
 
 const CrearPago = () => {
   const [clientes, setClientes] = useState([]);
@@ -127,36 +126,49 @@ const CrearPago = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-            {/* Cliente con autocompletado */}
+            {/* CAMBIO: Input con búsqueda en vez de select */}
             <Form.Group className="mb-3" controlId="cliente">
-              <Form.Label>Cliente (opcional)</Form.Label>
-              <Select
-                options={clientes.map((cliente) => ({
-                  value: cliente._id,
-                  label: `${cliente.nombre} ${cliente.apellido}`,
-                }))}
+              <Form.Label>Cliente</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Buscar cliente por nombre o apellido"
                 value={
-                  clientes
-                    .map((c) => ({
-                      value: c._id,
-                      label: `${c.nombre} ${c.apellido}`,
-                    }))
-                    .find((option) => option.value === formData.cliente) || null
+                  clientes.find((c) => c._id === formData.cliente)
+                    ? `${clientes.find((c) => c._id === formData.cliente).nombre} ${clientes.find((c) => c._id === formData.cliente).apellido}`
+                    : ""
                 }
-                onChange={(selectedOption) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    cliente: selectedOption ? selectedOption.value : "",
-                  }))
-                }
-                placeholder="Escriba para buscar cliente..."
-                isClearable
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase();
+                  const clienteEncontrado = clientes.find(
+                    (c) =>
+                      `${c.nombre} ${c.apellido}`
+                        .toLowerCase()
+                        .includes(value)
+                  );
+                  if (clienteEncontrado) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      cliente: clienteEncontrado._id,
+                    }));
+                  } else {
+                    setFormData((prev) => ({ ...prev, cliente: "" }));
+                  }
+                }}
+                list="clientes-list"
               />
+              <datalist id="clientes-list">
+                {clientes.map((cliente) => (
+                  <option
+                    key={cliente._id}
+                    value={`${cliente.nombre} ${cliente.apellido}`}
+                  />
+                ))}
+              </datalist>
             </Form.Group>
 
-            {/* Producto normal */}
+            {/* Producto */}
             <Form.Group className="mb-3" controlId="producto">
-              <Form.Label>Producto (opcional)</Form.Label>
+              <Form.Label>Producto</Form.Label>
               <Form.Control
                 as="select"
                 name="producto"
@@ -166,8 +178,7 @@ const CrearPago = () => {
                 <option value="">Seleccione un producto</option>
                 {productos.map((producto) => (
                   <option key={producto._id} value={producto._id}>
-                    {producto.nombre} - ${producto.precio} ({producto.stock} en
-                    stock)
+                    {producto.nombre} - ${producto.precio} ({producto.stock} en stock)
                   </option>
                 ))}
               </Form.Control>
