@@ -14,7 +14,7 @@ const CrearPago = () => {
     fecha: "",
     metodoPago: "Efectivo",
   });
-  const [searchCliente, setSearchCliente] = useState(""); // texto del input
+  const [searchCliente, setSearchCliente] = useState(""); // búsqueda por nombre
   const [error, setError] = useState("");
   const [showTiquete, setShowTiquete] = useState(false);
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ const CrearPago = () => {
     nombreEstablecimiento: "CLUB DEPORTIVO ICONIC ALL STARS ",
     direccion: "CALLE 2 B No. 69D-58 BOGOTA",
     telefonos: "3176696551",
-    nit: "000000000-0", // puedes cambiarlo si lo tienes en BD
+    nit: "000000000-0",
   };
 
   // Obtener y actualizar el contador del tiquete desde localStorage
@@ -134,7 +134,7 @@ const CrearPago = () => {
       <Card>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
-            {/* CLIENTE con datalist */}
+            {/* CLIENTE con búsqueda */}
             <Form.Group className="mb-3" controlId="cliente">
               <Form.Label>Cliente</Form.Label>
               <Form.Control
@@ -145,7 +145,7 @@ const CrearPago = () => {
                   const valor = e.target.value;
                   setSearchCliente(valor);
 
-                  // Buscar si coincide exactamente con un cliente
+                  // Validar coincidencia exacta
                   const seleccionado = clientes.find(
                     (c) =>
                       `${c.nombre} ${c.apellido}`.toLowerCase() ===
