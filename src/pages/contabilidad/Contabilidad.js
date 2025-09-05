@@ -14,7 +14,7 @@ const Contabilidad = () => {
   const [mes, setMes] = useState("");
   const [semana, setSemana] = useState("");
   const [tipoTransaccion, setTipoTransaccion] = useState("");
-  const [metodoPago, setMetodoPago] = useState("");
+  const [metodoPago, setMetodoPago] = useState(""); // ⬅️ filtro de método de pago
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +49,7 @@ const Contabilidad = () => {
 
       if (tipoTransaccion) params.tipo = tipoTransaccion;
       if (metodoPago && metodoPago !== "Todos") {
-        params.metodoPago = metodoPago;
+        params.metodoPago = metodoPago; // ⬅️ enviamos método de pago al backend
       }
 
       const response = await obtenerTransacciones(params);
@@ -118,14 +118,14 @@ const Contabilidad = () => {
       {},
     ];
 
-    const datosTransacciones = transacciones.map((t) => ({
-      "Cliente / Descripción": t.cliente?.nombre || t.descripcion || "N/A",
-      Producto: t.producto?.nombre || "N/A",
-      Monto: `$${t.monto?.toLocaleString()}`,
-      Fecha: formatFecha(t.fecha),
-      "Método de Pago": t.metodoPago || "N/A",
-      "Estado / Tipo": t.estado || t.tipo || "N/A",
-      "Creado Por": t.creadoPor?.nombre || "Desconocido",
+    const datosTransacciones = transacciones.map((transaccion) => ({
+      Cliente: transaccion.descripcion || "N/A",
+      Producto: transaccion.producto || "N/A",
+      Monto: `$${transaccion.monto.toLocaleString()}`,
+      Fecha: formatFecha(transaccion.fecha),
+      "Método de pago": transaccion.metodoPago || "N/A",
+      Estado: transaccion.estado || "N/A",
+      Tipo: transaccion.tipo === "ingreso" ? "Ingreso" : "Egreso",
     }));
 
     const datosCompletos = [...datosResumen, ...datosTransacciones];
@@ -145,6 +145,7 @@ const Contabilidad = () => {
       <h2>Contabilidad</h2>
       {error && <Alert variant="danger">{error}</Alert>}
 
+      {/* Filtros */}
       <Card className="mb-4">
         <Card.Body>
           <Card.Title>Filtrar Transacciones</Card.Title>
@@ -167,7 +168,7 @@ const Contabilidad = () => {
               {filtroTipo === "mes" ? (
                 <Col md={3}>
                   <Form.Group controlId="mes">
-                    <Form.Label>Yo</Form.Label>
+                    <Form.Label>Mes</Form.Label>
                     <Form.Control
                       type="month"
                       value={mes}
@@ -179,7 +180,7 @@ const Contabilidad = () => {
               ) : (
                 <Col md={3}>
                   <Form.Group controlId="semana">
-                    <Form.Label>Yo</Form.Label>
+                    <Form.Label>Semana</Form.Label>
                     <Form.Control
                       type="week"
                       value={semana}
@@ -243,6 +244,7 @@ const Contabilidad = () => {
         </Card.Body>
       </Card>
 
+      {/* Resumen */}
       <Card className="mb-4">
         <Card.Body>
           <Row>
@@ -287,15 +289,17 @@ const Contabilidad = () => {
         </Card.Body>
       </Card>
 
+      {/* Botón crear */}
       <Button
         variant="primary"
         className="mb-3"
         onClick={() => navigate("/contabilidad/crear-transaccion")}
         disabled={isLoading}
       >
-        Registrador Nueva Transacción
+        Registrar Nueva Transacción
       </Button>
 
+      {/* Tabla */}
       {isLoading && <Alert variant="info">Cargando transacciones...</Alert>}
       {!isLoading && transacciones.length === 0 && !error && (
         <Alert variant="info">No hay transacciones para mostrar.</Alert>
@@ -310,18 +314,22 @@ const Contabilidad = () => {
               <th>Monto</th>
               <th>Fecha</th>
               <th>Método de pago</th>
-              <th>Estado / Tipo</th>
+              <th>Estado</th>
+              <th>Tipo</th>
             </tr>
           </thead>
           <tbody>
-            {transacciones.map((t) => (
-              <tr key={t._id}>
-                <td>{t.cliente?.nombre || t.descripcion || "N/A"}</td>
-                <td>{t.producto?.nombre || "N/A"}</td>
-                <td>${t.monto?.toLocaleString()}</td>
-                <td>{formatFecha(t.fecha)}</td>
-                <td>{t.metodoPago || "N/A"}</td>
-                <td>{t.estado || t.tipo || "N/A"}</td>
+            {transacciones.map((transaccion) => (
+              <tr key={transaccion._id}>
+                <td>{transaccion.descripcion || "N/A"}</td>
+                <td>{transaccion.producto || "N/A"}</td>
+                <td>${transaccion.monto.toLocaleString()}</td>
+                <td>{formatFecha(transaccion.fecha)}</td>
+                <td>{transaccion.metodoPago || "N/A"}</td>
+                <td>{transaccion.estado || "N/A"}</td>
+                <td>
+                  {transaccion.tipo === "ingreso" ? "Ingreso" : "Egreso"}
+                </td>
               </tr>
             ))}
           </tbody>
