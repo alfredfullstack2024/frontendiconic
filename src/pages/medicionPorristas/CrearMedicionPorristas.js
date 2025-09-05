@@ -26,11 +26,27 @@ const CrearMedicionPorristas = () => {
   const navigate = useNavigate();
 
   const categorias = [
-    "1.1 MINI", "1.1 YOUTH", "1.1 SENIOR", "2.1 JUNIOR", "2.1 OPEN", "2.2 JUNIOR", "2.2 SENIOR",
-    "1 TINY", "1 MINI", "1 YOUTH", "1 JUNIOR", "1 SENIOR", "2 YOUTH", "2 JUNIOR", "2 SENIOR",
-    "2 OPEN", "3 YOUTH", "3 JUNIOR", "3 SENIOR", "3 OPEN", "3 OPEN NON-TUMBLING", "4.2 OPEN",
-    "4 SENIOR", "4 OPEN FEM", "4 OPEN MEDIUM", "4 OPEN LARGE", "5 OPEN", "5 OPEN NON-TUMBLING",
-    "6 OPEN", "7.5 OPEN", "7 OPEN"
+    "Tiny 1 Femenino", "Tiny 1 Coed", "Tiny 2 Femenino", "Tiny 2 Coed",
+    "Tiny 3 Femenino", "Tiny 3 Coed", "Tiny 4 Femenino", "Tiny 4 Coed",
+    "Tiny 5 Femenino", "Tiny 5 Coed", "Tiny 6 Femenino", "Tiny 6 Coed",
+    "Tiny 7 Femenino", "Tiny 7 Coed", "Mini 1 Femenino", "Mini 1 Coed",
+    "Mini 2 Femenino", "Mini 2 Coed", "Mini 3 Femenino", "Mini 3 Coed",
+    "Mini 4 Femenino", "Mini 4 Coed", "Mini 5 Femenino", "Mini 5 Coed",
+    "Mini 6 Femenino", "Mini 6 Coed", "Mini 7 Femenino", "Mini 7 Coed",
+    "Youth 1 Femenino", "Youth 1 Coed", "Youth 2 Femenino", "Youth 2 Coed",
+    "Youth 3 Femenino", "Youth 3 Coed", "Youth 4 Femenino", "Youth 4 Coed",
+    "Youth 5 Femenino", "Youth 5 Coed", "Youth 6 Femenino", "Youth 6 Coed",
+    "Youth 7 Femenino", "Youth 7 Coed", "Junior 1 Femenino", "Junior 1 Coed",
+    "Junior 2 Femenino", "Junior 2 Coed", "Junior 3 Femenino", "Junior 3 Coed",
+    "Junior 4 Femenino", "Junior 4 Coed", "Junior 5 Femenino", "Junior 5 Coed",
+    "Junior 6 Femenino", "Junior 6 Coed", "Junior 7 Femenino", "Junior 7 Coed",
+    "Senior 1 Femenino", "Senior 1 Coed", "Senior 2 Femenino", "Senior 2 Coed",
+    "Senior 3 Femenino", "Senior 3 Coed", "Senior 4 Femenino", "Senior 4 Coed",
+    "Senior 5 Femenino", "Senior 5 Coed", "Senior 6 Femenino", "Senior 6 Coed",
+    "Senior 7 Femenino", "Senior 7 Coed", "Open 1 Femenino", "Open 1 Coed",
+    "Open 2 Femenino", "Open 2 Coed", "Open 3 Femenino", "Open 3 Coed",
+    "Open 4 Femenino", "Open 4 Coed", "Open 5 Femenino", "Open 5 Coed",
+    "Open 6 Femenino", "Open 6 Coed", "Open 7 Femenino", "Open 7 Coed"
   ];
 
   const posiciones = ["Flyer", "Base", "Spotter", "Backspot", "Frontspot"];
