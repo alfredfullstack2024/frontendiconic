@@ -48,7 +48,6 @@ const Contabilidad = () => {
       }
 
       if (tipoTransaccion) params.tipo = tipoTransaccion;
-      // solo mandamos el método de pago si se trata de ingresos
       if (tipoTransaccion === "ingreso" && metodoPago && metodoPago !== "Todos") {
         params.metodoPago = metodoPago;
       }
