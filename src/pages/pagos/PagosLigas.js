@@ -62,40 +62,46 @@ const [comentarioPago, setComentarioPago] = useState("");
     const backendURL = process.env.REACT_APP_API_URL || "https://backend-5zxh.onrender.com/api";
 
     // ====== CARGA INICIAL COMPLETA ======
-    useEffect(() => {
-        const cargarDatosIniciales = async () => {
-            try {
-                const [mesesRes, clientesRes, configRes] = await Promise.all([
-                    axios.get(`${backendURL}/pagos-ligas/meses`),
-                    obtenerClientes(),
-                    axios.get(`${backendURL}/pagos-ligas/valor-diario`).catch(() => ({ data: { valorDiario: 8000 } })),
-                ]);
+   // ====== PEGA ESTO ======
+useEffect(() => {
+    const cargarDatosIniciales = async () => {
+        try {
+            const [mesesRes, clientesRes, configRes] = await Promise.all([
+                axios.get(`${backendURL}/pagos-ligas/meses`),
+                obtenerClientes(),
+                axios.get(`${backendURL}/pagos-ligas/valor-diario`).catch(() => ({ data: { valorDiario: 8000 } })),
+            ]);
 
-                const mesesData = mesesRes.data;
-                setMeses(mesesData);
-                setClientes(clientesRes.data);
-                setValorDiario(configRes.data.valorDiario || 8000);
+            const mesesData = mesesRes.data;
+            setMeses(mesesData);
+            setClientes(clientesRes.data);
+            setValorDiario(configRes.data.valorDiario || 8000);
 
-                // Lógica para seleccionar mes por defecto (Febrero o el actual)
-                if (mesesData.length > 0) {
-                    const mesFebrero = mesesData.find(m => m.nombre.toLowerCase().includes("febrero"));
-                    if (mesFebrero) {
-                        setMesSeleccionado(mesFebrero.nombre);
-                    } else {
-                        // Si no existe febrero, intentamos poner el mes actual generado por la función
-                        const actual = obtenerNombreMesActual();
-                        const existeActual = mesesData.find(m => m.nombre === actual);
-                        setMesSeleccionado(existeActual ? actual : mesesData[0].nombre);
-                    }
+            if (mesesData.length > 0) {
+                // 1. Obtenemos el nombre exacto del mes actual (ej: "Febrero 2026")
+                const nombreMesActual = obtenerNombreMesActual();
+                
+                // 2. Buscamos si ese mes ya existe en la base de datos
+                const mesActualEnBD = mesesData.find(m => 
+                    m.nombre.trim().toLowerCase() === nombreMesActual.toLowerCase()
+                );
+
+                if (mesActualEnBD) {
+                    // Si existe Febrero 2026, lo ponemos de primero
+                    setMesSeleccionado(mesActualEnBD.nombre);
+                } else {
+                    // Si aún no han creado el mes actual, ponemos el ÚLTIMO creado
+                    // (que suele ser el más reciente en la lista)
+                    setMesSeleccionado(mesesData[mesesData.length - 1].nombre);
                 }
-            } catch (error) {
-                console.error("Error en carga inicial:", error);
             }
-        };
+        } catch (error) {
+            console.error("Error en carga inicial:", error);
+        }
+    };
 
-        cargarDatosIniciales();
-    }, [backendURL]);
-
+    cargarDatosIniciales();
+}, [backendURL]);
    
                 // CARGAR PAGOS Y CALCULAR TOTAL (TOTAL GENERAL)
 useEffect(() => {
