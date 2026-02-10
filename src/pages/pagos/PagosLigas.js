@@ -81,17 +81,20 @@ const [comentarioPago, setComentarioPago] = useState("");
                 // ===========================================
                 // ⭐ LÓGICA MODIFICADA
                 // ===========================================
-                if (mesesData.length > 0) {
-    const mesActualExiste = mesesData.find(
-        m => m.nombre.toLowerCase().includes(nombreMesActual.toLowerCase())
-    );
+    useEffect(() => {
+    if (mesesData.length > 0) {
+        const mesFebrero = mesesData.find(m =>
+            m.nombre.toLowerCase().includes("febrero")
+        );
 
-    if (mesActualExiste) {
-        setMesSeleccionado(mesActualExiste.nombre);
-    } else {
-        setMesSeleccionado(mesesData[0].nombre);
+        if (mesFebrero) {
+            setMesSeleccionado(mesFebrero.nombre);
+        } else {
+            setMesSeleccionado(mesesData[0].nombre);
+        }
     }
-}
+}, [mesesData]);
+
 
 
             } catch (error) {
