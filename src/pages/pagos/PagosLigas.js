@@ -97,6 +97,7 @@ const [comentarioPago, setComentarioPago] = useState("");
 
 
 
+
             } catch (error) {
                 console.error("Error inicial", error);
             }
