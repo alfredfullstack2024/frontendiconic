@@ -82,17 +82,19 @@ const [comentarioPago, setComentarioPago] = useState("");
                 // ⭐ LÓGICA MODIFICADA
                 // ===========================================
                 if (mesesData.length > 0) {
-                    const mesActualExiste = mesesData.find(m => m.nombre === nombreMesActual);
-                    
-                    if (mesActualExiste) {
-                        // 1. Si existe un mes con el nombre actual (ej: "Diciembre 2025"), SELECCIONARLO.
-                        setMesSeleccionado(nombreMesActual);
-                    } else if (mesesData.length > 0) {
-                        // 2. Si no existe, seleccionar el ÚLTIMO creado (o el primero de la lista si no hay un orden claro del backend), como estaba antes, como fallback.
-                        // Asumo que mesesData[0] es el último/más reciente si no se encuentra el mes actual.
-                        setMesSeleccionado(mesesData[0].nombre);
-                    }
-                }
+    const mesActualExiste = mesesData.find(
+        m => m.nombre.trim().toLowerCase() === nombreMesActual.trim().toLowerCase()
+    );
+
+    if (mesActualExiste) {
+        // ✅ Siempre prioriza el mes actual
+        setMesSeleccionado(mesActualExiste.nombre);
+    } else {
+        // 🔁 Fallback: último creado (asumiendo backend ordenado)
+        setMesSeleccionado(mesesData[mesesData.length - 1].nombre);
+    }
+}
+
             } catch (error) {
                 console.error("Error inicial", error);
             }
