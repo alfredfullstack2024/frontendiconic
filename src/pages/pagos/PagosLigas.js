@@ -81,29 +81,33 @@ const [comentarioPago, setComentarioPago] = useState("");
                 // ===========================================
                 // ⭐ LÓGICA MODIFICADA
                 // ===========================================
-    useEffect(() => {
-    if (mesesData.length > 0) {
-        const mesFebrero = mesesData.find(m =>
-            m.nombre.toLowerCase().includes("febrero")
-        );
-
-        if (mesFebrero) {
-            setMesSeleccionado(mesFebrero.nombre);
-        } else {
-            setMesSeleccionado(mesesData[0].nombre);
+   // CARGA INICIAL
+useEffect(() => {
+    const cargarInicial = async () => {
+        try {
+            const res = await axios.get(`${backendURL}/pagos-ligas/meses`);
+            setMeses(res.data);
+        } catch (error) {
+            console.error("Error inicial", error);
         }
-    }
-}, [mesesData]);
+    };
 
+    cargarInicial();
+}, []);
 
+// SELECCIONAR FEBRERO DE PRIMERAS
+useEffect(() => {
+    if (meses.length === 0) return;
 
+    const mesFebrero = meses.find(m =>
+        m.nombre.toLowerCase().includes("febrero")
+    );
 
-            } catch (error) {
-                console.error("Error inicial", error);
-            }
-        };
-        cargarInicial();
-    }, []);
+    setMesSeleccionado(
+        mesFebrero ? mesFebrero.nombre : meses[0].nombre
+    );
+}, [meses]);
+
 
    
                 // CARGAR PAGOS Y CALCULAR TOTAL (TOTAL GENERAL)
