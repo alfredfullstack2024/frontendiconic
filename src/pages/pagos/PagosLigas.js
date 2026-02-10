@@ -81,7 +81,7 @@ const [comentarioPago, setComentarioPago] = useState("");
                 // ===========================================
                 // ⭐ LÓGICA MODIFICADA
                 // ===========================================
-   // CARGA INICIAL
+   // ====== CARGA INICIAL ======
 useEffect(() => {
     const cargarInicial = async () => {
         try {
@@ -94,6 +94,20 @@ useEffect(() => {
 
     cargarInicial();
 }, []);
+
+// ====== FEBRERO POR DEFECTO ======
+useEffect(() => {
+    if (meses.length === 0) return;
+
+    const mesFebrero = meses.find(m =>
+        m.nombre.toLowerCase().includes("febrero")
+    );
+
+    setMesSeleccionado(
+        mesFebrero ? mesFebrero.nombre : meses[0].nombre
+    );
+}, [meses]);
+
 
 // SELECCIONAR FEBRERO DE PRIMERAS
 useEffect(() => {
