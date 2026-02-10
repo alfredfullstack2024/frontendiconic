@@ -83,17 +83,16 @@ const [comentarioPago, setComentarioPago] = useState("");
                 // ===========================================
                 if (mesesData.length > 0) {
     const mesActualExiste = mesesData.find(
-        m => m.nombre.trim().toLowerCase() === nombreMesActual.trim().toLowerCase()
+        m => m.nombre.toLowerCase().includes(nombreMesActual.toLowerCase())
     );
 
     if (mesActualExiste) {
-        // ✅ Siempre prioriza el mes actual
         setMesSeleccionado(mesActualExiste.nombre);
     } else {
-        // 🔁 Fallback: último creado (asumiendo backend ordenado)
-        setMesSeleccionado(mesesData[mesesData.length - 1].nombre);
+        setMesSeleccionado(mesesData[0].nombre);
     }
 }
+
 
             } catch (error) {
                 console.error("Error inicial", error);
