@@ -176,7 +176,7 @@ const ResumenGeneral = () => {
                             <Card className="p-3 shadow-sm">
                                 <h5 className="text-center">Ligas</h5>
                                 <hr />
-                                <p>Total: <strong>${data.ligas.total.toLocaleString("es-CO")}</strong></p>
+                                <p>Total: <strong>${(data.ligas?.total || 0).toLocaleString("es-CO")}</strong></p>
                                 <p>Efectivo: ${data.ligas.efectivo.toLocaleString("es-CO")}</p>
                                 <p>Nequi: ${data.ligas.nequi.toLocaleString("es-CO")}</p>
                             </Card>
