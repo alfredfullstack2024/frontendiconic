@@ -60,6 +60,11 @@ const ResumenGeneral = () => {
             setError("");
 
             const { startDate, endDate } = obtenerRangoFechas();
+            console.log("Filtro tipo:", filtroTipo);
+console.log("Fecha inicio:", startDate);
+console.log("Fecha fin:", endDate);
+console.log("ISO inicio:", startDate?.toISOString());
+console.log("ISO fin:", endDate?.toISOString());
 
             if (!startDate || !endDate) {
                 setError("Selecciona un filtro válido");
