@@ -36,6 +36,7 @@ const [guardandoValor, setGuardandoValor] = useState(false);
     const [searchCliente, setSearchCliente] = useState("");
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
     const [diaSeleccionado, setDiaSeleccionado] = useState("");
+    const [diasSeleccionados, setDiasSeleccionados] = useState([]);
     const [esDiaDiferenteAHoy, setEsDiaDiferenteAHoy] = useState(false);
 const [comentarioPago, setComentarioPago] = useState("");
     // 🆕 NUEVO: Estado para el registro rápido
@@ -150,49 +151,52 @@ useEffect(() => {
 
     // REGISTRAR PAGO (Lógica actualizada para enviar tipoPago)
     const registrarPagoDia = async () => {
-    if (!clienteSeleccionado) return alert("Selecciona una niña");
-    if (!diaSeleccionado || diaSeleccionado < 1 || diaSeleccionado > 31) return alert("Día inválido");
-    if (!mesSeleccionado) return alert("Selecciona un mes");
-    if (!tipoPagoSeleccionado) return alert("Selecciona el tipo de pago");
+   if (!clienteSeleccionado) return alert("Selecciona una niña");
+if (!mesSeleccionado) return alert("Selecciona un mes");
+if (diasSeleccionados.length === 0) return alert("Selecciona al menos un día");
 
-    const hoy = new Date().getDate();
+try {
 
-    
+    const totalCalculado = diasSeleccionados.length * valorDiario;
 
-    try {
-        await axios.post(`${backendURL}/pagos-ligas/pagos`, {
-            nombre: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`.trim(),
-            mes: mesSeleccionado,
-            diasAsistidos: 1,
-            total: valorDiario,
-            diasPagados: [parseInt(diaSeleccionado)],
-            tipoPago: tipoPagoSeleccionado,
-            comentario: Number(diaSeleccionado) !== hoy ? comentarioPago.trim() : "",
-        });
+    await axios.post(`${backendURL}/pagos-ligas/pagos`, {
+        nombre: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`.trim(),
+        mes: mesSeleccionado,
+        diasAsistidos: diasSeleccionados.length,
+        total: totalCalculado,
+        diasPagados: diasSeleccionados.sort((a,b)=>a-b),
+        tipoPago: tipoPagoSeleccionado,
+        comentario: ""
+    });
 
-       alert(`Día ${diaSeleccionado} registrado correctamente`);
+    alert(`Pago registrado correctamente`);
 
-        // --- NUEVO: ESTO REFRESCARÁ LA TABLA DE INMEDIATO ---
-        const res = await axios.get(`${backendURL}/pagos-ligas/pagos/${mesSeleccionado}`);
-        const todosPagos = res.data || [];
-        const pagosReales = todosPagos.filter(p => p.nombre !== "SYSTEM" && p.nombre.trim() !== "");
-        const pagosEnriquecidos = pagosReales.map(pago => {
-            const cliente = clientes.find(c => `${c.nombre} ${c.apellido}`.trim().toLowerCase() === pago.nombre.trim().toLowerCase());
-            return { ...pago, especialidad: cliente?.especialidad || "Sin Especialidad", tipoPago: pago.tipoPago || "N/A" };
-        });
-        setPagosDelMes(pagosEnriquecidos);
-        // ----------------------------------------------------
+    const res = await axios.get(`${backendURL}/pagos-ligas/pagos/${mesSeleccionado}`);
+    const todosPagos = res.data || [];
+    const pagosReales = todosPagos.filter(p => p.nombre !== "SYSTEM" && p.nombre.trim() !== "");
 
-        setSearchCliente("");
-        setClienteSeleccionado(null);
-        setDiaSeleccionado("");
-        setComentarioPago("");
-        setEsDiaDiferenteAHoy(false);
+    const pagosEnriquecidos = pagosReales.map(pago => {
+        const cliente = clientes.find(c =>
+            `${c.nombre} ${c.apellido}`.trim().toLowerCase() === pago.nombre.trim().toLowerCase()
+        );
 
-    } catch (error) {
-        console.error(error);
-        alert("Error al registrar pago");
-    }
+        return {
+            ...pago,
+            especialidad: cliente?.especialidad || "Sin Especialidad",
+            tipoPago: pago.tipoPago || "N/A"
+        };
+    });
+
+    setPagosDelMes(pagosEnriquecidos);
+
+    setSearchCliente("");
+    setClienteSeleccionado(null);
+    setDiasSeleccionados([]);
+
+} catch (error) {
+    console.error(error);
+    alert("Error al registrar pago");
+}
 };
 
 
@@ -525,22 +529,54 @@ useEffect(() => {
                             </select>
                         </div>
 
-                        <input
-  type="number"
-  min="1"
-  max="31"
-  placeholder="Día"
-  value={diaSeleccionado}
-  onChange={(e) => {
-    const dia = e.target.value;
-    setDiaSeleccionado(dia);
+                       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+  <label style={{ fontWeight: "bold" }}>Seleccionar Días</label>
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(7, 40px)",
+    gap: "6px"
+  }}>
+    {[...Array(31)].map((_, i) => {
+      const dia = i + 1;
+      const seleccionado = diasSeleccionados.includes(dia);
 
-    const hoy = new Date().getDate();
-    setEsDiaDiferenteAHoy(Number(dia) !== hoy);
-    if (Number(dia) === hoy) setComentarioPago("");
-  }}
-  style={{ ...inputStyle, width: "100px" }}
-/>
+      return (
+        <div
+          key={dia}
+          onClick={() => {
+            if (seleccionado) {
+              setDiasSeleccionados(diasSeleccionados.filter(d => d !== dia));
+            } else {
+              setDiasSeleccionados([...diasSeleccionados, dia]);
+            }
+          }}
+          style={{
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "bold",
+            background: seleccionado ? "#22c55e" : "#e2e8f0",
+            color: seleccionado ? "white" : "#1e293b"
+          }}
+        >
+          {dia}
+        </div>
+      );
+    })}
+  </div>
+
+  <div style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
+    Clases seleccionadas: {diasSeleccionados.length}
+  </div>
+
+  <div style={{ fontWeight: "bold" }}>
+    Total a pagar: ${(diasSeleccionados.length * valorDiario).toLocaleString("es-CO")}
+  </div>
+</div>
 
 
                         <button onClick={registrarPagoDia} style={btnSuccess}>
