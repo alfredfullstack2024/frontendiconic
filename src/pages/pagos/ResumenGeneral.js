@@ -12,11 +12,12 @@ const ResumenGeneral = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
+    // 🔥 Nueva estructura detallada
     const [data, setData] = useState({
-        pagos: 0,
-        ligas: 0,
-        pagosMes: 0,
-        total: 0,
+        ligas: { total: 0, efectivo: 0, nequi: 0 },
+        mensualidades: { total: 0, efectivo: 0, nequi: 0 },
+        productos: { total: 0, efectivo: 0, nequi: 0 },
+        totalGeneral: 0,
     });
 
     const obtenerRangoFechas = () => {
@@ -75,6 +76,7 @@ const ResumenGeneral = () => {
             });
 
             setData(res.data);
+
         } catch (e) {
             console.error("Error resumen general", e);
             setError("Error al cargar el resumen general");
@@ -85,10 +87,11 @@ const ResumenGeneral = () => {
 
     return (
         <div className="container mt-4">
-            <h2>Resumen General de Recaudo</h2>
+            <h2 className="mb-4">Resumen General de Recaudo</h2>
 
             {error && <Alert variant="danger">{error}</Alert>}
 
+            {/* FILTROS */}
             <Card className="mb-4">
                 <Card.Body>
                     <Row className="align-items-end">
@@ -158,35 +161,52 @@ const ResumenGeneral = () => {
                 </Card.Body>
             </Card>
 
+            {/* RESULTADOS */}
             {loading ? (
                 <Spinner animation="border" />
             ) : (
-                <Row>
-                    <Col md={3}>
-                        <Card className="p-3 text-center">
-                            <h5>Pagos</h5>
-                            <h3>${data.pagos.toLocaleString("es-CO")}</h3>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card className="p-3 text-center">
-                            <h5>Ligas</h5>
-                            <h3>${data.ligas.toLocaleString("es-CO")}</h3>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card className="p-3 text-center">
-                            <h5>Pagos Mes</h5>
-                            <h3>${data.pagosMes.toLocaleString("es-CO")}</h3>
-                        </Card>
-                    </Col>
-                    <Col md={3}>
-                        <Card bg="dark" text="white" className="p-3 text-center">
-                            <h5>TOTAL</h5>
-                            <h2>${data.total.toLocaleString("es-CO")}</h2>
-                        </Card>
-                    </Col>
-                </Row>
+                <>
+                    <Row className="mb-4">
+                        <Col md={4}>
+                            <Card className="p-3 shadow-sm">
+                                <h5 className="text-center">Ligas</h5>
+                                <hr />
+                                <p>Total: <strong>${data.ligas.total.toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${data.ligas.efectivo.toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${data.ligas.nequi.toLocaleString("es-CO")}</p>
+                            </Card>
+                        </Col>
+
+                        <Col md={4}>
+                            <Card className="p-3 shadow-sm">
+                                <h5 className="text-center">Mensualidades</h5>
+                                <hr />
+                                <p>Total: <strong>${data.mensualidades.total.toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${data.mensualidades.efectivo.toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${data.mensualidades.nequi.toLocaleString("es-CO")}</p>
+                            </Card>
+                        </Col>
+
+                        <Col md={4}>
+                            <Card className="p-3 shadow-sm">
+                                <h5 className="text-center">Productos</h5>
+                                <hr />
+                                <p>Total: <strong>${data.productos.total.toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${data.productos.efectivo.toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${data.productos.nequi.toLocaleString("es-CO")}</p>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    <Row>
+                        <Col md={12}>
+                            <Card bg="dark" text="white" className="p-4 text-center shadow">
+                                <h4>TOTAL GENERAL</h4>
+                                <h2>${data.totalGeneral.toLocaleString("es-CO")}</h2>
+                            </Card>
+                        </Col>
+                    </Row>
+                </>
             )}
         </div>
     );
