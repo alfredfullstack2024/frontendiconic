@@ -30,6 +30,8 @@ const PagosLigas = () => {
     const [mesSeleccionado, setMesSeleccionado] = useState("");
     const [nuevoMes, setNuevoMes] = useState("");
     const [valorDiario, setValorDiario] = useState(8000);
+const [valorDiarioTemp, setValorDiarioTemp] = useState(8000);
+const [guardandoValor, setGuardandoValor] = useState(false);
     const [clientes, setClientes] = useState([]);
     const [searchCliente, setSearchCliente] = useState("");
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
@@ -74,7 +76,9 @@ useEffect(() => {
             const mesesData = mesesRes.data;
             setMeses(mesesData);
             setClientes(clientesRes.data);
-            setValorDiario(configRes.data.valorDiario || 8000);
+            const valorConfig = configRes.data.valorDiario || 8000;
+setValorDiario(valorConfig);
+setValorDiarioTemp(valorConfig);
 
             if (mesesData.length > 0) {
                 // 1. Obtenemos el nombre exacto del mes actual (ej: "Febrero 2026")
@@ -334,12 +338,51 @@ useEffect(() => {
                             {meses.map(m => <option key={m._id} value={m.nombre}>{m.nombre}</option>)}
                         </select>
                         <input
-                            type="number"
-                            value={valorDiario}
-                            onChange={(e) => setValorDiario(Number(e.target.value))}
-                            style={{ ...inputStyle, width: "140px" }}
-                            placeholder="Valor diario"
-                        />
+    type="number"
+    value={valorDiarioTemp}
+    onChange={(e) => setValorDiarioTemp(Number(e.target.value))}
+    style={{ ...inputStyle, width: "140px" }}
+    placeholder="Valor diario"
+/>
+
+<button
+    onClick={async () => {
+        if (valorDiarioTemp <= 0) {
+            alert("Valor inválido");
+            return;
+        }
+
+        const confirmar = window.confirm(
+            `¿Estás seguro de cambiar el valor diario de $${valorDiario.toLocaleString("es-CO")} a $${valorDiarioTemp.toLocaleString("es-CO")}?\n\nEste cambio afectará solo los nuevos registros.`
+        );
+
+        if (!confirmar) return;
+
+        try {
+            setGuardandoValor(true);
+
+            await axios.put(`${backendURL}/pagos-ligas/configuracion`, {
+                valorDiario: valorDiarioTemp,
+            });
+
+            setValorDiario(valorDiarioTemp);
+
+            alert("Valor diario actualizado correctamente");
+        } catch (error) {
+            alert("Error al actualizar valor diario");
+        } finally {
+            setGuardandoValor(false);
+        }
+    }}
+    style={{
+        ...btnPrimary,
+        opacity: guardandoValor ? 0.6 : 1,
+        cursor: guardandoValor ? "not-allowed" : "pointer",
+    }}
+    disabled={guardandoValor}
+>
+    Guardar Valor
+</button>
                     </div>
                     <div style={{ background: "#172554", color: "white", padding: "1.5rem 4rem", borderRadius: "1.5rem", fontSize: "2.5rem", fontWeight: "bold" }}>
                         TOTAL RECAUDADO (MES): ${totalRecaudado.toLocaleString("es-CO")}
