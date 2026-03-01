@@ -165,13 +165,13 @@ const ResumenGeneral = () => {
 
                         <Col md={3}>
                             <Button
-                                variant="primary"
-                                className="w-100"
-                                onClick={cargarResumen}
-                            >
-                                Consultar
-                            </Button>
-                        </Col>
+    type="button"
+    variant="primary"
+    className="w-100"
+    onClick={cargarResumen}
+>
+    Consultar
+</Button>                       </Col>
                     </Row>
                 </Card.Body>
             </Card>
