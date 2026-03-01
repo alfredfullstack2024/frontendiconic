@@ -164,11 +164,14 @@ const ResumenGeneral = () => {
                         )}
 
                         <Col md={3}>
-                            <Button
+                           <Button
     type="button"
     variant="primary"
     className="w-100"
-    onClick={cargarResumen}
+    onClick={() => {
+        console.log("CLICK FUNCIONA");
+        cargarResumen();
+    }}
 >
     Consultar
 </Button>                       </Col>
