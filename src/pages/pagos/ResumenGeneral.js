@@ -75,7 +75,12 @@ const ResumenGeneral = () => {
                 },
             });
 
-            setData(res.data);
+            setData({
+    ligas: res.data.ligas || { total: 0, efectivo: 0, nequi: 0 },
+    mensualidades: res.data.mensualidades || { total: 0, efectivo: 0, nequi: 0 },
+    productos: res.data.productos || { total: 0, efectivo: 0, nequi: 0 },
+    totalGeneral: res.data.totalGeneral || 0,
+});
 
         } catch (e) {
             console.error("Error resumen general", e);
