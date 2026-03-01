@@ -12,7 +12,6 @@ const ResumenGeneral = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // 🔥 Nueva estructura detallada
     const [data, setData] = useState({
         ligas: { total: 0, efectivo: 0, nequi: 0 },
         mensualidades: { total: 0, efectivo: 0, nequi: 0 },
@@ -41,7 +40,7 @@ const ResumenGeneral = () => {
             const [year, week] = semana.split("-W");
             const date = new Date(year, 0, 1);
             const day = date.getDay();
-            const dayOffset = (day <= 4) ? -day + 1 : -day + 8;
+            const dayOffset = day <= 4 ? -day + 1 : -day + 8;
             date.setDate(date.getDate() + dayOffset + (week - 1) * 7);
 
             startDate = new Date(date);
@@ -64,7 +63,6 @@ const ResumenGeneral = () => {
 
             if (!startDate || !endDate) {
                 setError("Selecciona un filtro válido");
-                setLoading(false);
                 return;
             }
 
@@ -76,11 +74,23 @@ const ResumenGeneral = () => {
             });
 
             setData({
-    ligas: res.data.ligas || { total: 0, efectivo: 0, nequi: 0 },
-    mensualidades: res.data.mensualidades || { total: 0, efectivo: 0, nequi: 0 },
-    productos: res.data.productos || { total: 0, efectivo: 0, nequi: 0 },
-    totalGeneral: res.data.totalGeneral || 0,
-});
+                ligas: {
+                    total: res.data?.ligas?.total || 0,
+                    efectivo: res.data?.ligas?.efectivo || 0,
+                    nequi: res.data?.ligas?.nequi || 0,
+                },
+                mensualidades: {
+                    total: res.data?.mensualidades?.total || 0,
+                    efectivo: res.data?.mensualidades?.efectivo || 0,
+                    nequi: res.data?.mensualidades?.nequi || 0,
+                },
+                productos: {
+                    total: res.data?.productos?.total || 0,
+                    efectivo: res.data?.productos?.efectivo || 0,
+                    nequi: res.data?.productos?.nequi || 0,
+                },
+                totalGeneral: res.data?.totalGeneral || 0,
+            });
 
         } catch (e) {
             console.error("Error resumen general", e);
@@ -176,9 +186,9 @@ const ResumenGeneral = () => {
                             <Card className="p-3 shadow-sm">
                                 <h5 className="text-center">Ligas</h5>
                                 <hr />
-                                <p>Total: <strong>${(data.ligas?.total || 0).toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${data.ligas.efectivo.toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${data.ligas.nequi.toLocaleString("es-CO")}</p>
+                                <p>Total: <strong>${(data.ligas.total || 0).toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${(data.ligas.efectivo || 0).toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${(data.ligas.nequi || 0).toLocaleString("es-CO")}</p>
                             </Card>
                         </Col>
 
@@ -186,9 +196,9 @@ const ResumenGeneral = () => {
                             <Card className="p-3 shadow-sm">
                                 <h5 className="text-center">Mensualidades</h5>
                                 <hr />
-                                <p>Total: <strong>${data.mensualidades.total.toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${data.mensualidades.efectivo.toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${data.mensualidades.nequi.toLocaleString("es-CO")}</p>
+                                <p>Total: <strong>${(data.mensualidades.total || 0).toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${(data.mensualidades.efectivo || 0).toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${(data.mensualidades.nequi || 0).toLocaleString("es-CO")}</p>
                             </Card>
                         </Col>
 
@@ -196,9 +206,9 @@ const ResumenGeneral = () => {
                             <Card className="p-3 shadow-sm">
                                 <h5 className="text-center">Productos</h5>
                                 <hr />
-                                <p>Total: <strong>${data.productos.total.toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${data.productos.efectivo.toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${data.productos.nequi.toLocaleString("es-CO")}</p>
+                                <p>Total: <strong>${(data.productos.total || 0).toLocaleString("es-CO")}</strong></p>
+                                <p>Efectivo: ${(data.productos.efectivo || 0).toLocaleString("es-CO")}</p>
+                                <p>Nequi: ${(data.productos.nequi || 0).toLocaleString("es-CO")}</p>
                             </Card>
                         </Col>
                     </Row>
@@ -207,7 +217,7 @@ const ResumenGeneral = () => {
                         <Col md={12}>
                             <Card bg="dark" text="white" className="p-4 text-center shadow">
                                 <h4>TOTAL GENERAL</h4>
-                                <h2>${data.totalGeneral.toLocaleString("es-CO")}</h2>
+                                <h2>${(data.totalGeneral || 0).toLocaleString("es-CO")}</h2>
                             </Card>
                         </Col>
                     </Row>
