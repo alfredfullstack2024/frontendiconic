@@ -264,44 +264,55 @@ const CrearPago = () => {
           {showTiquete && (
             <div>
               <div
-                id="tiquete"
-                style={{
-                  width: "280px",
-                  padding: "10px",
-                  border: "1px solid #000",
-                  marginTop: "20px",
-                }}
-              >
-                <h1>{tiqueteConfig.nombreEstablecimiento}</h1>
-                <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
-                <p style={{ textAlign: "center" }}>
-                  Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
-                </p>
-                <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
-                <p>Recibo #: {ticketNumber}</p>
-                <p>
-                  Cliente:{" "}
-                  {clientes.find((c) => c._id === formData.cliente)?.nombre ||
-                    "No especificado"}
-                </p>
-                <h4>Mensualidad Gym 2025</h4>
-                <p>Inicio: {formData.fecha}</p>
-                <p>Final: {fechaFinal.toLocaleDateString("es-CO")}</p>
-                <p>
-                  Pago:{" "}
-                  {formData.monto.toLocaleString("es-CO", {
-                    style: "currency",
-                    currency: "COP",
-                  })}
-                </p>
-                <p>Saldo: $0</p>
-                <p>Método: {formData.metodoPago}</p>
-                <p style={{ fontSize: "8px" }}>
-                  Mensualidad intransferible, no congelable, sin devolución de
-                  dinero.
-                </p>
-              </div>
+  id="tiquete"
+  style={{
+    width: "280px",
+    padding: "10px",
+    border: "1px solid #000",
+    marginTop: "20px",
+  }}
+>
+  <h1>{tiqueteConfig.nombreEstablecimiento}</h1>
+  <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
+  <p style={{ textAlign: "center" }}>
+    Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
+  </p>
+  <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
+  <p>Recibo #: {ticketNumber}</p>
+  
+  {/* CAMBIO 1: Mostrar Nombre y Apellido completos */}
+  <p>
+    Cliente:{" "}
+    {(() => {
+      const c = clientes.find((cli) => cli._id === formData.cliente);
+      return c ? `${c.nombre} ${c.apellido}` : "No especificado";
+    })()}
+  </p>
 
+  {/* CAMBIO 2: Mostrar el nombre del producto real en lugar de texto fijo */}
+  <h4 style={{ textTransform: "uppercase", marginTop: "10px" }}>
+    {productos.find((p) => p._id === formData.producto)?.nombre || "PAGO GENERAL"}
+  </h4>
+  
+  <p>Fecha de pago: {formData.fecha}</p>
+
+  {/* CAMBIO 3: Se eliminó la línea de "Final" que no querías */}
+
+  <p>
+    Monto:{" "}
+    {formData.monto.toLocaleString("es-CO", {
+      style: "currency",
+      currency: "COP",
+      minimumFractionDigits: 0
+    })}
+  </p>
+  <p>Saldo: $0</p>
+  <p>Método: {formData.metodoPago}</p>
+  
+  <p style={{ fontSize: "9px", marginTop: "10px", borderTop: "1px dashed #ccc", paddingTop: "5px" }}>
+    Gracias por su compra. Conserve este tiquete.
+  </p>
+</div>
               <Button
                 variant="primary"
                 className="mt-2"
@@ -325,4 +336,5 @@ const CrearPago = () => {
 };
 
 export default CrearPago;
+
 
