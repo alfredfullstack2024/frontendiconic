@@ -108,6 +108,42 @@ const Pagames = () => {
 
     const datosFiltrados = useMemo(() => {
         let pagos = pagosDelAnio;
+        const hoy = new Date();
+
+if (filtroPeriodo === "DIA") {
+    pagos = pagos.filter(p => {
+        if (!p.createdAt) return false;
+        const fecha = new Date(p.createdAt);
+        return fecha.toDateString() === hoy.toDateString();
+    });
+}
+
+if (filtroPeriodo === "SEMANA") {
+    const inicioSemana = new Date(hoy);
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+    inicioSemana.setHours(0, 0, 0, 0);
+
+    const finSemana = new Date(inicioSemana);
+    finSemana.setDate(inicioSemana.getDate() + 6);
+    finSemana.setHours(23, 59, 59, 999);
+
+    pagos = pagos.filter(p => {
+        if (!p.createdAt) return false;
+        const fecha = new Date(p.createdAt);
+        return fecha >= inicioSemana && fecha <= finSemana;
+    });
+}
+
+if (filtroPeriodo === "MES") {
+    pagos = pagos.filter(p => {
+        if (!p.createdAt) return false;
+        const fecha = new Date(p.createdAt);
+        return (
+            fecha.getMonth() === hoy.getMonth() &&
+            fecha.getFullYear() === hoy.getFullYear()
+        );
+    });
+}
 
         if (filtroNombre.trim()) {
             pagos = pagos.filter(p => p.nombre.toLowerCase().includes(filtroNombre.toLowerCase()));
