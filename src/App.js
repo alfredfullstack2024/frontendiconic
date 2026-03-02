@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
+import PagoRapido from "./pages/pagos/PagoRapido";
 
 // Páginas Públicas
 import Login from "./pages/Login";
@@ -108,6 +109,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/consulta-usuario" element={<ConsultaUsuario />} />
+    <Route path="/pagos/pago-rapido" element={<PagoRapido />} />
       <Route
         path="/"
         element={
