@@ -118,14 +118,17 @@ const Pagames = () => {
         if (filtroTipoPago !== "TODOS") {
             pagos = pagos.filter(p => p.tipoPago === filtroTipoPago);
         }
+        
+        // Filtro de periodo
         if (filtroPeriodo !== "TODO EL AÑO") {
-        pagos = pagos.filter(p => p.mesesPagados.includes(filtroPeriodo));
-    }
+            pagos = pagos.filter(p => p.mesesPagados.includes(filtroPeriodo));
+        }
 
         const total = pagos.reduce((acc, p) => acc + p.total, 0);
         return { pagos, total };
-    }, [pagosDelAnio, filtroNombre, filtroEspecialidad, filtroTipoPago]);
-
+        
+        // AQUÍ ESTABA EL ERROR: faltaba agregar filtroPeriodo al final
+    }, [pagosDelAnio, filtroNombre, filtroEspecialidad, filtroTipoPago, filtroPeriodo]);
     const nombresUnicosFiltrados = useMemo(() => {
         return [...new Set(datosFiltrados.pagos.map(p => p.nombre))];
     }, [datosFiltrados.pagos]);
