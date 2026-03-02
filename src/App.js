@@ -109,7 +109,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/consulta-usuario" element={<ConsultaUsuario />} />
-    <Route path="/pagos/pago-rapido" element={<PagoRapido />} />
+    
       <Route
         path="/"
         element={
@@ -148,6 +148,7 @@ const App = () => {
 
           {/* Pagos */}
           <Route path="/pagos" element={<RoleBasedRoute element={<Pagos />} allowedRoles={["recepcionista","admin"]} />} />
+          <Route path="/pagos/pago-rapido" element={<RoleBasedRoute element={<PagoRapido />} allowedRoles={["recepcionista","admin"]} />} />
           <Route path="/pagos/crear" element={<RoleBasedRoute element={<CrearPago />} allowedRoles={["recepcionista","admin"]} />} />
           <Route path="/pagos/editar/:id" element={<RoleBasedRoute element={<EditarPago />} allowedRoles={["recepcionista","admin"]} />} />
           <Route path="/pagos/reporte" element={<RoleBasedRoute element={<ReportePagosPorEquipo />} allowedRoles={["recepcionista","admin"]} />} />
