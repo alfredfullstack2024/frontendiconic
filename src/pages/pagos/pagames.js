@@ -108,42 +108,6 @@ const Pagames = () => {
 
     const datosFiltrados = useMemo(() => {
         let pagos = pagosDelAnio;
-        const hoy = new Date();
-
-if (filtroPeriodo === "DIA") {
-    pagos = pagos.filter(p => {
-        if (!p.createdAt) return false;
-        const fecha = new Date(p.createdAt);
-        return fecha.toDateString() === hoy.toDateString();
-    });
-}
-
-if (filtroPeriodo === "SEMANA") {
-    const inicioSemana = new Date(hoy);
-    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
-    inicioSemana.setHours(0, 0, 0, 0);
-
-    const finSemana = new Date(inicioSemana);
-    finSemana.setDate(inicioSemana.getDate() + 6);
-    finSemana.setHours(23, 59, 59, 999);
-
-    pagos = pagos.filter(p => {
-        if (!p.createdAt) return false;
-        const fecha = new Date(p.createdAt);
-        return fecha >= inicioSemana && fecha <= finSemana;
-    });
-}
-
-if (filtroPeriodo === "MES") {
-    pagos = pagos.filter(p => {
-        if (!p.createdAt) return false;
-        const fecha = new Date(p.createdAt);
-        return (
-            fecha.getMonth() === hoy.getMonth() &&
-            fecha.getFullYear() === hoy.getFullYear()
-        );
-    });
-}
 
         if (filtroNombre.trim()) {
             pagos = pagos.filter(p => p.nombre.toLowerCase().includes(filtroNombre.toLowerCase()));
@@ -246,10 +210,8 @@ if (filtroPeriodo === "MES") {
                         <div style={{ display: "flex", flexDirection: "column" }}>
                             <label style={{ fontSize: "0.9rem", color: "#475569" }}>Periodo</label>
                             <select value={filtroPeriodo} onChange={e => setFiltroPeriodo(e.target.value)} style={{ ...selectStyle, padding: "0.6rem" }}>
-    <option value="MES">Mes Completo</option>
-    <option value="SEMANA">Semana</option>
-    <option value="DIA">Diario</option>
-</select>
+                                <option value="MES">Mes Completo</option>
+                            </select>
                         </div>
                         <div style={{ background: "#064e3b", color: "white", padding: "1rem 2rem", borderRadius: "1rem", fontSize: "1.5rem", fontWeight: "bold", marginLeft: "auto" }}>
                             TOTAL FILTRADO: ${datosFiltrados.total.toLocaleString("es-CO")}
