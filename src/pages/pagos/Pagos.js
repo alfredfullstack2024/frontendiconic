@@ -139,18 +139,22 @@ const Pagos = () => {
     };
 
     const eliminarPago = async (id) => {
-        if (!window.confirm("¿Estás seguro de que deseas eliminar este pago?")) return;
+        // Mensaje de confirmación
+        const confirmar = window.confirm("¿Estás seguro de que deseas eliminar este pago? El stock del producto se devolverá automáticamente.");
+        
+        if (!confirmar) return; // Si dice que no, se cancela todo
+
         try {
             setIsLoading(true);
-            await api.delete(`/pagos/${id}`);
-            await fetchPagos(); 
+            await api.delete(`/pagos/${id}`); // Ahora esta ruta sí existe
+            alert("Eliminado con éxito");
+            await fetchPagos(); // Recarga la lista
         } catch (err) {
-            setError("Error al eliminar el pago: " + (err.response?.data?.message || err.message));
+            setError("Error al eliminar: " + (err.response?.data?.mensaje || err.message));
         } finally {
             setIsLoading(false);
         }
     };
-
     const formatFecha = (fecha) => new Date(fecha).toLocaleDateString("es-ES");
 
     const abrirResumen = async () => {
@@ -426,6 +430,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
