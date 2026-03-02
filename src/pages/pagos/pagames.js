@@ -210,8 +210,10 @@ const Pagames = () => {
                         <div style={{ display: "flex", flexDirection: "column" }}>
                             <label style={{ fontSize: "0.9rem", color: "#475569" }}>Periodo</label>
                             <select value={filtroPeriodo} onChange={e => setFiltroPeriodo(e.target.value)} style={{ ...selectStyle, padding: "0.6rem" }}>
-                                <option value="MES">Mes Completo</option>
-                            </select>
+    <option value="MES">Mes Completo</option>
+    <option value="SEMANA">Semana</option>
+    <option value="DIA">Diario</option>
+</select>
                         </div>
                         <div style={{ background: "#064e3b", color: "white", padding: "1rem 2rem", borderRadius: "1rem", fontSize: "1.5rem", fontWeight: "bold", marginLeft: "auto" }}>
                             TOTAL FILTRADO: ${datosFiltrados.total.toLocaleString("es-CO")}
