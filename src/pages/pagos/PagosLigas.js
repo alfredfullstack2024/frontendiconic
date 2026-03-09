@@ -653,9 +653,21 @@ if (!p.diasPagados) return;
 p.diasPagados.forEach(d => {
 
 if (typeof d === "number") {
-if (d === diaActual) iconos.push({ tipo: "HOY" });
+
+if (d === diaActual) {
+
+const hoy = new Date().getDate();
+
+let tipo = "HOY";
+
+if (diaActual < hoy) tipo = "ATRASADO";
+if (diaActual > hoy) tipo = "ADELANTADO";
+
+iconos.push({ tipo });
+
 }
 
+}
 if (typeof d === "object") {
 if (d.dia === diaActual) iconos.push(d);
 }
