@@ -158,13 +158,25 @@ if (diasSeleccionados.length === 0) return alert("Selecciona al menos un día");
 try {
 
     const totalCalculado = diasSeleccionados.length * valorDiario;
+const hoy = new Date().getDate();
 
+const diasConTipo = diasSeleccionados.map(dia => {
+  let tipo = "HOY";
+
+  if (dia < hoy) tipo = "ATRASADO";
+  if (dia > hoy) tipo = "ADELANTADO";
+
+  return {
+    dia: dia,
+    tipo: tipo
+  };
+});
     await axios.post(`${backendURL}/pagos-ligas/pagos`, {
         nombre: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`.trim(),
         mes: mesSeleccionado,
         diasAsistidos: diasSeleccionados.length,
         total: totalCalculado,
-        diasPagados: diasSeleccionados.sort((a,b)=>a-b),
+        
         tipoPago: tipoPagoSeleccionado,
         comentario: ""
     });
