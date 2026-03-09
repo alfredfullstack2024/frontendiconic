@@ -652,28 +652,28 @@ if (!p.diasPagados) return;
 
 p.diasPagados.forEach(d => {
 
-if (typeof d === "number") {
+let dia = null;
+let tipo = "HOY";
 
-if (d === diaActual) {
+if (typeof d === "number") {
+dia = d;
 
 const hoy = new Date().getDate();
 
-let tipo = "HOY";
+if (dia < hoy) tipo = "ATRASADO";
+if (dia > hoy) tipo = "ADELANTADO";
+}
 
-if (diaActual < hoy) tipo = "ATRASADO";
-if (diaActual > hoy) tipo = "ADELANTADO";
+else if (typeof d === "object") {
+dia = d.dia;
+tipo = d.tipo;
+}
 
+if (dia === diaActual) {
 iconos.push({ tipo });
-
-}
-
-}
-if (typeof d === "object") {
-if (d.dia === diaActual) iconos.push(d);
 }
 
 });
-
 });
 
 return (
