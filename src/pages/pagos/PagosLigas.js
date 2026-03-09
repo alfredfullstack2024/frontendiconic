@@ -330,13 +330,33 @@ const diasConTipo = diasSeleccionados.map(dia => {
     };
 
     // Función para obtener los días pagados, ahora usando solo los pagos filtrados
-    const getDiasPagadosFiltrados = (nombre) => {
-        // En el caso de que se filtre por Tipo de Pago, solo contamos los días registrados con ESE tipo.
-        const pagos = pagosFiltrados.pagosFiltradosPorEspecialidad.filter(p => p.nombre.trim() === nombre.trim());
-        const dias = new Set();
-        pagos.forEach(p => (p.diasPagados || []).forEach(d => dias.add(d)));
-        return Array.from(dias).sort((a, b) => a - b);
-    };
+ const getDiasPagadosFiltrados = (nombre) => {
+
+const pagos = pagosFiltrados.pagosFiltradosPorEspecialidad.filter(
+p => p.nombre.trim() === nombre.trim()
+);
+
+const dias = [];
+
+pagos.forEach(p => {
+
+(p.diasPagados || []).forEach(d => {
+
+if (typeof d === "number") {
+dias.push(d);
+}
+
+else if (typeof d === "object" && d.dia) {
+dias.push(d.dia);
+}
+
+});
+
+});
+
+return dias;
+
+};
 
     return (
         <div style={{ padding: "2rem", background: "#f8fafc", minHeight: "100vh" }}>
