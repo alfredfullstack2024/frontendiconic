@@ -332,7 +332,7 @@ const diasConTipo = diasSeleccionados.map(dia => {
     // Función para obtener los días pagados, ahora usando solo los pagos filtrados
  const getDiasPagadosFiltrados = (nombre) => {
 
-const pagos = pagosFiltrados.pagosFiltradosPorEspecialidad.filter(
+const pagos = pagosDelMes.filter(
 p => p.nombre.trim() === nombre.trim()
 );
 
@@ -342,12 +342,18 @@ pagos.forEach(p => {
 
 (p.diasPagados || []).forEach(d => {
 
+let dia = null;
+
 if (typeof d === "number") {
-dias.push(d);
+dia = d;
 }
 
-if (typeof d === "object" && d.dia) {
-dias.push(d.dia);
+else if (typeof d === "object") {
+dia = d.dia;
+}
+
+if (dia !== null) {
+dias.push(dia);
 }
 
 });
