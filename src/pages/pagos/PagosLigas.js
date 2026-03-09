@@ -346,7 +346,7 @@ if (typeof d === "number") {
 dias.push(d);
 }
 
-else if (typeof d === "object" && d.dia) {
+if (typeof d === "object" && d.dia) {
 dias.push(d.dia);
 }
 
@@ -357,7 +357,6 @@ dias.push(d.dia);
 return dias;
 
 };
-
     return (
         <div style={{ padding: "2rem", background: "#f8fafc", minHeight: "100vh" }}>
             <div style={{ maxWidth: "2200px", margin: "0 auto", background: "white", borderRadius: "1.5rem", padding: "2.5rem", boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}>
