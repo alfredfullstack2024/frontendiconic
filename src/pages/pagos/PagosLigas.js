@@ -549,37 +549,38 @@ const diasConTipo = diasSeleccionados.map(dia => {
     gap: "6px"
   }}>
     {[...Array(31)].map((_, i) => {
-      const dia = i + 1;
-      const seleccionado = diasSeleccionados.includes(dia);
 
-      return (
-        <div
-          key={dia}
-          onClick={() => {
-            if (seleccionado) {
-              setDiasSeleccionados(diasSeleccionados.filter(d => d !== dia));
-            } else {
-              setDiasSeleccionados([...diasSeleccionados, dia]);
-            }
-          }}
-          style={{
-            width: "40px",
-            height: "40px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "bold",
-            background: seleccionado ? "#22c55e" : "#e2e8f0",
-            color: seleccionado ? "white" : "#1e293b"
-          }}
-        >
-          {dia}
-        </div>
-      );
-    })}
-  </div>
+const dia = i + 1;
+
+const cantidad = diasSeleccionados.filter(d => d === dia).length;
+
+return (
+<div
+key={dia}
+onClick={() => {
+
+setDiasSeleccionados([...diasSeleccionados, dia]);
+
+}}
+style={{
+width: "40px",
+height: "40px",
+display: "flex",
+alignItems: "center",
+justifyContent: "center",
+borderRadius: "6px",
+cursor: "pointer",
+fontWeight: "bold",
+background: cantidad > 0 ? "#22c55e" : "#e2e8f0",
+color: cantidad > 0 ? "white" : "#1e293b"
+}}
+>
+
+{cantidad > 1 ? `${dia}(${cantidad})` : dia}
+
+</div>
+);
+})}  </div>
 
   <div style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
     Clases seleccionadas: {diasSeleccionados.length}
