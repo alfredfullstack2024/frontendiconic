@@ -176,7 +176,7 @@ const diasConTipo = diasSeleccionados.map(dia => {
         mes: mesSeleccionado,
         diasAsistidos: diasSeleccionados.length,
         total: totalCalculado,
-        
+        diasPagados: diasConTipo,
         tipoPago: tipoPagoSeleccionado,
         comentario: ""
     });
@@ -637,26 +637,39 @@ const diasConTipo = diasSeleccionados.map(dia => {
                                                 </td>
                                                {[...Array(31)].map((_, i) => {
     const diaActual = i + 1;
-    const hoy = new Date().getDate(); 
 
-    const registroDeEsteDia = pagosDelMes.find(p => 
-        p.nombre.trim() === nombre.trim() && 
-        p.diasPagados.includes(diaActual)
+    const registro = pagosDelMes.find(p =>
+        p.nombre.trim() === nombre.trim() &&
+        (p.diasPagados || []).some(d => d.dia === diaActual)
     );
 
-    // Si el día de la celda es hoy sale X verde, si es otro día sale círculo azul
-    const esHoy = diaActual === hoy;
+    const infoDia = registro?.diasPagados?.find(d => d.dia === diaActual);
 
     return (
-        <td key={diaActual} style={{ textAlign: "center", padding: "0.5rem 0", minWidth: "60px", border: "1px solid #e2e8f0" }}>
-            {registroDeEsteDia && (
-                <div style={{ 
-                    fontSize: esHoy ? "1.8rem" : "1.4rem", 
-                    fontWeight: "bold",
-                    lineHeight: "1",
-                    color: esHoy ? "#22c55e" : "#3b82f6" 
-                }}>
-                    {esHoy ? "X" : "●"}
+        <td
+            key={diaActual}
+            style={{
+                textAlign: "center",
+                padding: "0.5rem 0",
+                minWidth: "60px",
+                border: "1px solid #e2e8f0"
+            }}
+        >
+            {infoDia && (
+                <div
+                    style={{
+                        fontSize: "1.6rem",
+                        fontWeight: "bold",
+                        lineHeight: "1",
+                        color:
+                            infoDia.tipo === "HOY"
+                                ? "#22c55e"
+                                : infoDia.tipo === "ATRASADO"
+                                ? "#ef4444"
+                                : "#3b82f6"
+                    }}
+                >
+                    {infoDia.tipo === "HOY" ? "X" : "●"}
                 </div>
             )}
         </td>
