@@ -637,44 +637,68 @@ color: cantidad > 0 ? "white" : "#1e293b"
                                                     {tipoPago}
                                                 </td>
                                                {[...Array(31)].map((_, i) => {
-    const diaActual = i + 1;
 
-    const registro = pagosDelMes.find(p =>
-        p.nombre.trim() === nombre.trim() &&
-        (p.diasPagados || []).some(d => d.dia === diaActual)
-    );
+const diaActual = i + 1;
 
-    const infoDia = registro?.diasPagados?.find(d => d.dia === diaActual);
+const pagosJugador = pagosDelMes.filter(
+p => p.nombre.trim() === nombre.trim()
+);
 
-    return (
-        <td
-            key={diaActual}
-            style={{
-                textAlign: "center",
-                padding: "0.5rem 0",
-                minWidth: "60px",
-                border: "1px solid #e2e8f0"
-            }}
-        >
-            {infoDia && (
-                <div
-                    style={{
-                        fontSize: "1.6rem",
-                        fontWeight: "bold",
-                        lineHeight: "1",
-                        color:
-                            infoDia.tipo === "HOY"
-                                ? "#22c55e"
-                                : infoDia.tipo === "ATRASADO"
-                                ? "#ef4444"
-                                : "#3b82f6"
-                    }}
-                >
-                    {infoDia.tipo === "HOY" ? "X" : "●"}
-                </div>
-            )}
-        </td>
-    );
+let iconos = [];
+
+pagosJugador.forEach(p => {
+
+if (!p.diasPagados) return;
+
+p.diasPagados.forEach(d => {
+
+if (typeof d === "number") {
+if (d === diaActual) iconos.push({ tipo: "HOY" });
+}
+
+if (typeof d === "object") {
+if (d.dia === diaActual) iconos.push(d);
+}
+
+});
+
+});
+
+return (
+<td
+key={diaActual}
+style={{
+textAlign: "center",
+padding: "0.5rem 0",
+minWidth: "60px",
+border: "1px solid #e2e8f0"
+}}
+>
+
+{iconos.map((infoDia, index) => (
+
+<div
+key={index}
+style={{
+fontSize: "1.4rem",
+fontWeight: "bold",
+lineHeight: "1",
+color:
+infoDia.tipo === "HOY"
+? "#22c55e"
+: infoDia.tipo === "ATRASADO"
+? "#ef4444"
+: "#3b82f6"
+}}
+>
+{infoDia.tipo === "HOY" ? "X" : "●"}
+
+</div>
+
+))}
+
+</td>
+);
 })}
                                                 <td style={{ ...tdStyle, background: "#ecfeff", fontWeight: "bold", fontSize: "1.3rem", color: "#0891b2" }}>
                                                     {dias.length}
