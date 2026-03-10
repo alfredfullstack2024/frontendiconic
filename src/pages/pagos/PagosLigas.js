@@ -258,16 +258,25 @@ const diasConTipo = diasSeleccionados.map(dia => {
         }
 
         // 4. Filtrar por Período
-        if (filtroPeriodo === "DIA" && filtroDia) {
-            const diaNum = parseInt(filtroDia, 10);
+       if (filtroPeriodo === "DIA" && filtroDia) {
 
-            const jugadoresConDiaPagado = new Set();
-            pagos.forEach(pago => {
-                if (pago.diasPagados.includes(diaNum)) {
-                    jugadoresConDiaPagado.add(pago.nombre.trim());
-                }
-            });
+const diaNum = parseInt(filtroDia, 10);
 
+const jugadoresConDiaPagado = new Set();
+
+pagos.forEach(pago => {
+
+(pago.diasPagados || []).forEach(d => {
+
+const dia = typeof d === "number" ? d : d.dia;
+
+if (dia === diaNum) {
+jugadoresConDiaPagado.add(pago.nombre.trim());
+}
+
+});
+
+});
             // El total es el número de jugadores que pagaron ESE día (considerando todos los filtros anteriores)
             total = jugadoresConDiaPagado.size * valorDiario;
         }
@@ -284,8 +293,11 @@ const diasConTipo = diasSeleccionados.map(dia => {
             const diasPagadosEnSemana = new Set();
             // Contar la cantidad de pares únicos (jugador-día) que cumplen el filtro
             pagos.forEach(pago => {
-                pago.diasPagados.forEach(dia => {
-                    if (diasSemana.includes(dia)) {
+                pago.diasPagados.forEach(d => {
+
+const dia = typeof d === "number" ? d : d.dia;
+
+if (diasSemana.includes(dia)) {
                         diasPagadosEnSemana.add(`${pago.nombre.trim()}-${dia}`);
                     }
                 });
