@@ -673,45 +673,15 @@ color: cantidad > 0 ? "white" : "#1e293b"
                                                 <td style={{ ...tdStyle, background: "#f1f5f9", color: tipoPago === 'Nequi' ? '#ea580c' : '#16a34a' }}>
                                                     {tipoPago}
                                                 </td>
-                                               {[...Array(31)].map((_, i) => {
+                                              {[...Array(31)].map((_, i) => {
 
 const diaActual = i + 1;
 
-const pagosJugador = pagosDelMes.filter(
-p => p.nombre.trim() === nombre.trim()
-);
+const diasJugador = getDiasPagadosFiltrados(nombre);
 
-let iconos = [];
-
-pagosJugador.forEach(p => {
-
-if (!p.diasPagados) return;
-
-p.diasPagados.forEach(d => {
-
-let dia = null;
-let tipo = "HOY";
-
-if (typeof d === "number") {
-dia = d;
-
-const hoy = new Date().getDate();
-
-if (dia < hoy) tipo = "ATRASADO";
-if (dia > hoy) tipo = "ADELANTADO";
-}
-
-else if (typeof d === "object") {
-dia = d.dia;
-tipo = d.tipo;
-}
-
-if (dia === diaActual) {
-iconos.push({ tipo });
-}
-
-});
-});
+const iconos = diasJugador
+  .filter(dia => dia === diaActual)
+  .map(() => ({ tipo: "ATRASADO" }));
 
 return (
 <td
@@ -732,22 +702,18 @@ style={{
 fontSize: "1.4rem",
 fontWeight: "bold",
 lineHeight: "1",
-color:
-infoDia.tipo === "HOY"
-? "#22c55e"
-: infoDia.tipo === "ATRASADO"
-? "#ef4444"
-: "#3b82f6"
+color: "#ef4444"
 }}
 >
-{infoDia.tipo === "HOY" ? "X" : "●"}
-
+●
 </div>
 
 ))}
 
 </td>
 );
+
+
 })}
                                                 <td style={{ ...tdStyle, background: "#ecfeff", fontWeight: "bold", fontSize: "1.3rem", color: "#0891b2" }}>
                                                     {dias.length}
