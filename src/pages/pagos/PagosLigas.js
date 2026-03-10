@@ -677,11 +677,26 @@ color: cantidad > 0 ? "white" : "#1e293b"
 
 const diaActual = i + 1;
 
-const diasJugador = getDiasPagadosFiltrados(nombre);
+const pagosJugador = pagosDelMes.filter(
+p => p.nombre.trim() === nombre.trim()
+);
 
-const iconos = diasJugador
-  .filter(dia => dia === diaActual)
-  .map(() => ({ tipo: "ATRASADO" }));
+let iconos = [];
+
+pagosJugador.forEach(p => {
+
+(p.diasPagados || []).forEach(d => {
+
+const dia = typeof d === "number" ? d : d.dia;
+const tipo = typeof d === "object" ? d.tipo : "ATRASADO";
+
+if (dia === diaActual) {
+iconos.push({ tipo });
+}
+
+});
+
+});
 
 return (
 <td
@@ -702,17 +717,21 @@ style={{
 fontSize: "1.4rem",
 fontWeight: "bold",
 lineHeight: "1",
-color: "#ef4444"
+color:
+infoDia.tipo === "HOY"
+? "#22c55e"
+: infoDia.tipo === "ATRASADO"
+? "#ef4444"
+: "#3b82f6"
 }}
 >
-●
+{infoDia.tipo === "HOY" ? "X" : "●"}
 </div>
 
 ))}
 
 </td>
 );
-
 
 })}
                                                 <td style={{ ...tdStyle, background: "#ecfeff", fontWeight: "bold", fontSize: "1.3rem", color: "#0891b2" }}>
