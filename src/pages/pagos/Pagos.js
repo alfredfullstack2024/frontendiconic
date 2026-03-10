@@ -371,13 +371,15 @@ const Pagos = () => {
                         {pagosFiltrados.map((pago) => (
                             <tr key={pago._id}>
                                 <td>
-                                    {pago.cliente
-                                        ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`
-                                        : "Sin cliente"}
-                                </td>
+    {pago.cliente
+        ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`
+        : pago.clienteManual || "Sin cliente"}
+</td>
                                 <td>{formatCurrencySafe(pago.monto)}</td>
                                 <td>{formatFecha(pago.fecha)}</td>
-                                <td>{pago.producto?.nombre || "No especificado"}</td>
+                                <td>
+    {pago.producto?.nombre || pago.productoManual || "No especificado"}
+</td>
                                 <td>
                                     <Button variant="warning" size="sm" className="me-2" onClick={() => navigate(`/pagos/editar/${pago._id}`)}>
                                         Editar
@@ -433,6 +435,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
