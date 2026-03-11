@@ -155,7 +155,10 @@ const Pagos = () => {
             setIsLoading(false);
         }
     };
-    const formatFecha = (fecha) => new Date(fecha).toLocaleDateString("es-ES");
+    const formatFecha = (fecha) => {
+    if (!fecha) return "Sin fecha";
+    return new Date(fecha).toLocaleDateString("es-ES");
+};
 
     const abrirResumen = async () => {
         try {
@@ -237,7 +240,7 @@ const Pagos = () => {
             <Card className="mb-4">
                 <Card.Body>
                     <Card.Title>Filtros por Fecha y Nombre</Card.Title>
-                    <Form onSubmit={(e) => { e.preventDefault(); fetchPagos(); }}>
+                    <Form>
                         <Row className="align-items-end">
                             <Col md={2}>
                                 <Form.Group>
@@ -307,7 +310,7 @@ const Pagos = () => {
                             <Col md={3}>
                                 <Row>
                                     <Col xs={6}>
-                                        <Button type="submit" variant="primary" className="w-100 mt-3">Filtrar</Button>
+                                        <Button variant="primary" className="w-100 mt-3" onClick={fetchPagos}>Filtrar</Button>
                                     </Col>
                                     <Col xs={6}>
                                         <Button variant="secondary" onClick={limpiarFiltros} className="w-100 mt-3">Limpiar</Button>
@@ -369,7 +372,7 @@ const Pagos = () => {
                     </thead>
                     <tbody>
                         {pagosFiltrados.map((pago) => (
-                            <tr key={pago._id}>
+                            <tr key={pago._id || `${pago.fecha}-${pago.monto}-${Math.random()}`}>
                                 <td>
     {pago.cliente
         ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`
@@ -435,6 +438,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
