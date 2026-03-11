@@ -11,34 +11,22 @@ const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // Al iniciar la app, leer token y (opcional) obtener /auth/me
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      // Intentamos obtener datos del usuario de /auth/me (si existe endpoint)
-      (async () => {
-        try {
-          setLoading(true);
-          const res = await api.get("/auth/me");
-          const userData = res.data;
-          // Normalizar rol
-          const rol = userData.rol || userData.role || "user";
-          setUser({ ...userData, rol });
-        } catch (err) {
-          console.warn("No se pudo obtener /auth/me o token inválido:", err.message);
-          localStorage.removeItem("token");
-          delete api.defaults.headers.common["Authorization"];
-          setUser(null);
-        } finally {
-          setLoading(false);
-        }
-      })();
-    } else {
-      delete api.defaults.headers.common["Authorization"];
-      setUser(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  const storedUser = localStorage.getItem("user");
+
+  if (token && storedUser) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    const userData = JSON.parse(storedUser);
+    const rol = userData.rol || userData.role || "user";
+
+    setUser({ ...userData, rol });
+  } else {
+    delete api.defaults.headers.common["Authorization"];
+    setUser(null);
+  }
+}, []);
 
   const login = async (email, password) => {
     try {
@@ -49,10 +37,12 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const userData = response.data.user || {};
-      const rol = userData.rol || userData.role || "user";
-      setUser({ ...userData, rol, token });
+     const userData = response.data.user || {};
+const rol = userData.rol || userData.role || "user";
 
+localStorage.setItem("user", JSON.stringify(userData));
+
+setUser({ ...userData, rol, token });
       // Navegar al dashboard
       navigate("/dashboard");
       return { success: true };
@@ -86,11 +76,12 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    delete api.defaults.headers.common["Authorization"];
-    setUser(null);
-    navigate("/login");
-  };
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  delete api.defaults.headers.common["Authorization"];
+  setUser(null);
+  navigate("/login");
+};
 
   const hasPermission = (requiredRole) => {
     if (!user) return false;
@@ -112,3 +103,4 @@ const useAuth = () => {
 };
 
 export { AuthContext, AuthProvider, useAuth };
+
