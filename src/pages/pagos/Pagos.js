@@ -110,25 +110,29 @@ const Pagos = () => {
 
     // --- 2. Filtro local por nombre y cálculo de TOTAL FILTRADO ---
     useEffect(() => {
-        let filtrados;
-        
-        if (!busquedaNombre) {
-            filtrados = pagos;
-        } else {
-            filtrados = pagos.filter((pago) => {
-                const nombreCliente = pago.cliente
-                    ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-                    : "";
-                return nombreCliente.includes(busquedaNombre.toLowerCase());
-            });
-        }
-        setPagosFiltrados(filtrados);
 
-        const total = filtrados.reduce((sum, pago) => sum + (pago.monto || 0), 0);
-        setTotalRecaudadoFiltrado(total);
-        
-    }, [busquedaNombre, pagos]);
+    let filtrados;
 
+    if (!busquedaNombre) {
+        filtrados = pagos;
+    } else {
+        filtrados = pagos.filter((pago) => {
+            const nombreCliente = pago.cliente
+                ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
+                : (pago.clienteManual || "").toLowerCase();
+
+            return nombreCliente.includes(busquedaNombre.toLowerCase());
+        });
+    }
+
+    setPagosFiltrados(filtrados);
+
+    // usar total que manda backend
+    setTotalRecaudadoFiltrado(
+        filtrados.reduce((sum, pago) => sum + Number(pago.monto || 0), 0)
+    );
+
+}, [busquedaNombre, pagos]);
     const limpiarFiltros = () => {
         setFiltroTipo("dia");
         setDia(todayISO);
@@ -440,6 +444,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
