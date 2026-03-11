@@ -13,9 +13,9 @@ const ResumenGeneral = () => {
     const [error, setError] = useState("");
 
     const [data, setData] = useState({
-        ligas: { total: 0, efectivo: 0, nequi: 0 },
-        mensualidades: { total: 0, efectivo: 0, nequi: 0 },
-        productos: { total: 0, efectivo: 0, nequi: 0 },
+        ligas: { total: 0, efectivo: 0, transferencia: 0, tarjeta: 0 },
+        mensualidades: { total: 0, efectivo: 0, transferencia: 0, tarjeta: 0 },
+        productos: { total: 0, efectivo: 0, transferencia: 0, tarjeta: 0 },
         totalGeneral: 0,
     });
 
@@ -78,25 +78,27 @@ console.log("ISO fin:", endDate?.toISOString());
                 },
             });
 
-            setData({
+           setData({
                 ligas: {
                     total: res.data?.ligas?.total || 0,
                     efectivo: res.data?.ligas?.efectivo || 0,
-                    nequi: res.data?.ligas?.nequi || 0,
+                    transferencia: res.data?.ligas?.transferencia || 0,
+                    tarjeta: res.data?.ligas?.tarjeta || 0,
                 },
                 mensualidades: {
                     total: res.data?.mensualidades?.total || 0,
                     efectivo: res.data?.mensualidades?.efectivo || 0,
-                    nequi: res.data?.mensualidades?.nequi || 0,
+                    transferencia: res.data?.mensualidades?.transferencia || 0,
+                    tarjeta: res.data?.mensualidades?.tarjeta || 0,
                 },
                 productos: {
                     total: res.data?.productos?.total || 0,
                     efectivo: res.data?.productos?.efectivo || 0,
-                    nequi: res.data?.productos?.nequi || 0,
+                    transferencia: res.data?.productos?.transferencia || 0,
+                    tarjeta: res.data?.productos?.tarjeta || 0,
                 },
                 totalGeneral: res.data?.totalGeneral || 0,
             });
-
         } catch (e) {
             console.error("Error resumen general", e);
             setError("Error al cargar el resumen general");
@@ -192,11 +194,24 @@ console.log("ISO fin:", endDate?.toISOString());
                     <Row className="mb-4">
                         <Col md={4}>
                             <Card className="p-3 shadow-sm">
-                                <h5 className="text-center">Ligas</h5>
+                                <h5 className="text-center">Productos</h5>
                                 <hr />
-                                <p>Total: <strong>${(data.ligas.total || 0).toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${(data.ligas.efectivo || 0).toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${(data.ligas.nequi || 0).toLocaleString("es-CO")}</p>
+                                <p className="d-flex justify-content-between">
+                                    <strong>Total:</strong> 
+                                    <strong>${(data.productos.total || 0).toLocaleString("es-CO")}</strong>
+                                </p>
+                                <p className="d-flex justify-content-between">
+                                    <span>Efectivo:</span> 
+                                    <span>${(data.productos.efectivo || 0).toLocaleString("es-CO")}</span>
+                                </p>
+                                <p className="d-flex justify-content-between">
+                                    <span>Transferencia:</span> 
+                                    <span>${(data.productos.transferencia || 0).toLocaleString("es-CO")}</span>
+                                </p>
+                                <p className="d-flex justify-content-between">
+                                    <span>Tarjeta:</span> 
+                                    <span>${(data.productos.tarjeta || 0).toLocaleString("es-CO")}</span>
+                                </p>
                             </Card>
                         </Col>
 
