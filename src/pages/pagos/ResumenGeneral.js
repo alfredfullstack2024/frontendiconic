@@ -60,11 +60,6 @@ const ResumenGeneral = () => {
             setError("");
 
             const { startDate, endDate } = obtenerRangoFechas();
-            console.log("Filtro tipo:", filtroTipo);
-console.log("Fecha inicio:", startDate);
-console.log("Fecha fin:", endDate);
-console.log("ISO inicio:", startDate?.toISOString());
-console.log("ISO fin:", endDate?.toISOString());
 
             if (!startDate || !endDate) {
                 setError("Selecciona un filtro válido");
@@ -78,7 +73,7 @@ console.log("ISO fin:", endDate?.toISOString());
                 },
             });
 
-           setData({
+            setData({
                 ligas: {
                     total: res.data?.ligas?.total || 0,
                     efectivo: res.data?.ligas?.efectivo || 0,
@@ -107,13 +102,36 @@ console.log("ISO fin:", endDate?.toISOString());
         }
     };
 
+    // Componente interno para no repetir código de las tarjetas
+    const StatCard = ({ title, stats }) => (
+        <Card className="p-3 shadow-sm h-100">
+            <h5 className="text-center">{title}</h5>
+            <hr />
+            <div className="d-flex justify-content-between mb-2">
+                <strong>Total:</strong>
+                <strong>${(stats.total || 0).toLocaleString("es-CO")}</strong>
+            </div>
+            <div className="d-flex justify-content-between">
+                <span>Efectivo:</span>
+                <span>${(stats.efectivo || 0).toLocaleString("es-CO")}</span>
+            </div>
+            <div className="d-flex justify-content-between">
+                <span>Transferencia:</span>
+                <span>${(stats.transferencia || 0).toLocaleString("es-CO")}</span>
+            </div>
+            <div className="d-flex justify-content-between">
+                <span>Tarjeta:</span>
+                <span>${(stats.tarjeta || 0).toLocaleString("es-CO")}</span>
+            </div>
+        </Card>
+    );
+
     return (
         <div className="container mt-4">
             <h2 className="mb-4">Resumen General de Recaudo</h2>
 
             {error && <Alert variant="danger">{error}</Alert>}
 
-            {/* FILTROS */}
             <Card className="mb-4">
                 <Card.Body>
                     <Row className="align-items-end">
@@ -171,68 +189,35 @@ console.log("ISO fin:", endDate?.toISOString());
                         )}
 
                         <Col md={3}>
-                           <Button
-    type="button"
-    variant="primary"
-    className="w-100"
-    onClick={() => {
-        console.log("CLICK FUNCIONA");
-        cargarResumen();
-    }}
->
-    Consultar
-</Button>                       </Col>
+                            <Button
+                                type="button"
+                                variant="primary"
+                                className="w-100"
+                                onClick={cargarResumen}
+                                disabled={loading}
+                            >
+                                {loading ? <Spinner size="sm" /> : "Consultar"}
+                            </Button>
+                        </Col>
                     </Row>
                 </Card.Body>
             </Card>
 
-            {/* RESULTADOS */}
             {loading ? (
-                <Spinner animation="border" />
+                <div className="text-center my-5">
+                    <Spinner animation="border" variant="primary" />
+                </div>
             ) : (
                 <>
                     <Row className="mb-4">
-                        <Col md={4}>
-                            <Card className="p-3 shadow-sm">
-                                <h5 className="text-center">Productos</h5>
-                                <hr />
-                                <p className="d-flex justify-content-between">
-                                    <strong>Total:</strong> 
-                                    <strong>${(data.productos.total || 0).toLocaleString("es-CO")}</strong>
-                                </p>
-                                <p className="d-flex justify-content-between">
-                                    <span>Efectivo:</span> 
-                                    <span>${(data.productos.efectivo || 0).toLocaleString("es-CO")}</span>
-                                </p>
-                                <p className="d-flex justify-content-between">
-                                    <span>Transferencia:</span> 
-                                    <span>${(data.productos.transferencia || 0).toLocaleString("es-CO")}</span>
-                                </p>
-                                <p className="d-flex justify-content-between">
-                                    <span>Tarjeta:</span> 
-                                    <span>${(data.productos.tarjeta || 0).toLocaleString("es-CO")}</span>
-                                </p>
-                            </Card>
+                        <Col md={4} className="mb-3 mb-md-0">
+                            <StatCard title="Ligas" stats={data.ligas} />
                         </Col>
-
-                        <Col md={4}>
-                            <Card className="p-3 shadow-sm">
-                                <h5 className="text-center">Mensualidades</h5>
-                                <hr />
-                                <p>Total: <strong>${(data.mensualidades.total || 0).toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${(data.mensualidades.efectivo || 0).toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${(data.mensualidades.nequi || 0).toLocaleString("es-CO")}</p>
-                            </Card>
+                        <Col md={4} className="mb-3 mb-md-0">
+                            <StatCard title="Mensualidades" stats={data.mensualidades} />
                         </Col>
-
                         <Col md={4}>
-                            <Card className="p-3 shadow-sm">
-                                <h5 className="text-center">Productos</h5>
-                                <hr />
-                                <p>Total: <strong>${(data.productos.total || 0).toLocaleString("es-CO")}</strong></p>
-                                <p>Efectivo: ${(data.productos.efectivo || 0).toLocaleString("es-CO")}</p>
-                                <p>Nequi: ${(data.productos.nequi || 0).toLocaleString("es-CO")}</p>
-                            </Card>
+                            <StatCard title="Productos" stats={data.productos} />
                         </Col>
                     </Row>
 
