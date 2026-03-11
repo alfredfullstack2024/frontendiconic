@@ -372,7 +372,7 @@ const Pagos = () => {
                     </thead>
                     <tbody>
                         {pagosFiltrados.map((pago) => (
-                            <tr key={pago._id || `${pago.fecha}-${pago.monto}-${Math.random()}`}>
+                           <tr key={pago._id || `${pago.fecha}-${pago.monto}`}>
                                 <td>
     {pago.cliente
         ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`
@@ -381,7 +381,9 @@ const Pagos = () => {
                                 <td>{formatCurrencySafe(pago.monto)}</td>
                                 <td>{formatFecha(pago.fecha)}</td>
                                 <td>
-    {pago.producto?.nombre || pago.productoManual || "No especificado"}
+    {pago.producto && pago.producto.nombre
+  ? pago.producto.nombre
+  : pago.productoManual || "No especificado"}
 </td>
                                 <td>
                                     <Button variant="warning" size="sm" className="me-2" onClick={() => navigate(`/pagos/editar/${pago._id}`)}>
@@ -438,6 +440,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
