@@ -73,14 +73,11 @@ const Pagos = () => {
                         
                 params.fechaInicio = startDate.toISOString();
                 params.fechaFin = endDate.toISOString();
-            } else if (filtroTipo === "dia" && dia) {
-                const startDate = new Date(dia);
-                startDate.setHours(0, 0, 0, 0);
-                const endDate = new Date(dia);
-                endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
-            }
+           } else if (filtroTipo === "dia" && dia) {
+    // Forzamos el formato literal para que no convierta zonas horarias
+    params.fechaInicio = `${dia}T00:00:00.000Z`;
+    params.fechaFin = `${dia}T23:59:59.999Z`;
+}
 
             // A) Obtener el total GENERAL (sin filtros de fecha)
             const allResponse = await api.get("/pagos");
@@ -444,6 +441,7 @@ const Pagos = () => {
 };
 
 export default Pagos;
+
 
 
 
