@@ -664,29 +664,8 @@ color: cantidad > 0 ? "white" : "#1e293b"
             if (arriba) arriba.scrollLeft = e.target.scrollLeft;
         }}
     >
-                   {mesSeleccionado && (
-<>
-    <div 
-        id="scroll-superior"
-        style={{ overflowX: 'auto', overflowY: 'hidden', width: '100%' }}
-        onScroll={(e) => {
-            const abajo = document.getElementById('contenedor-tabla');
-            if (abajo) abajo.scrollLeft = e.target.scrollLeft;
-        }}
-    >
-        <div style={{ width: "2800px", height: "1px" }}></div>
-    </div>
-
-    <div 
-        id="contenedor-tabla"
-        style={{ overflowX: "auto", borderRadius: "1.5rem", boxShadow: "0 15px 35px rgba(0,0,0,0.15)" }}
-        onScroll={(e) => {
-            const arriba = document.getElementById('scroll-superior');
-            if (arriba) arriba.scrollLeft = e.target.scrollLeft;
-        }}
-    >
-
-        <table style={{ width: "100%", minWidth: "2800px", borderCollapse: "collapse" }}>               <table style={{ width: "100%", minWidth: "2800px", borderCollapse: "collapse" }}>
+                  
+                       <table style={{ width: "100%", minWidth: "2800px", borderCollapse: "collapse" }}>
                             <thead>
                                 <tr style={{ background: "#1e293b", color: "white" }}>
                                     <th style={{ ...thStyle, position: "sticky", left: 0, background: "#1e293b", zIndex: 10, width: "200px" }}>Jugadora</th>
