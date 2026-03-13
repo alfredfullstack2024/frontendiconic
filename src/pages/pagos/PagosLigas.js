@@ -28,6 +28,7 @@ const TIPOS_PAGO = ["TODOS", "Efectivo", "Nequi"];
 const PagosLigas = () => {
     const [meses, setMeses] = useState([]);
     const [mesSeleccionado, setMesSeleccionado] = useState("");
+    const [valorManual, setValorManual] = useState("");
     const [nuevoMes, setNuevoMes] = useState("");
     const [valorDiario, setValorDiario] = useState(8000);
 const [valorDiarioTemp, setValorDiarioTemp] = useState(8000);
@@ -157,7 +158,7 @@ if (diasSeleccionados.length === 0) return alert("Selecciona al menos un día");
 
 try {
 
-    const totalCalculado = diasSeleccionados.length * valorDiario;
+    const totalFinal = valorManual !== "" ? Number(valorManual) : (diasSeleccionados.length * valorDiario);
 const hoy = new Date().getDate();
 
 const diasConTipo = diasSeleccionados.map(dia => {
@@ -175,7 +176,7 @@ const diasConTipo = diasSeleccionados.map(dia => {
         nombre: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`.trim(),
         mes: mesSeleccionado,
         diasAsistidos: diasSeleccionados.length,
-        total: totalCalculado,
+        total: totalFinal,
         diasPagados: diasConTipo,
         tipoPago: tipoPagoSeleccionado,
         comentario: ""
@@ -623,9 +624,19 @@ color: cantidad > 0 ? "white" : "#1e293b"
     Clases seleccionadas: {diasSeleccionados.length}
   </div>
 
-  <div style={{ fontWeight: "bold" }}>
-    Total a pagar: ${(diasSeleccionados.length * valorDiario).toLocaleString("es-CO")}
-  </div>
+ <div style={{ marginTop: "10px" }}>
+  <label style={{ fontSize: "12px", fontWeight: "bold", display: "block", color: "#333" }}>Valor manual (Opcional):</label>
+  <input 
+    type="number" 
+    value={valorManual} 
+    onChange={(e) => setValorManual(e.target.value)}
+    placeholder="Ej: 5000"
+    style={{ border: "2px solid #000", borderRadius: "4px", padding: "8px", width: "120px", marginTop: "5px" }}
+  />
+</div>
+<div style={{ fontWeight: "bold", marginTop: "10px" }}>
+  Total a pagar: ${valorManual !== "" ? Number(valorManual).toLocaleString("es-CO") : (diasSeleccionados.length * valorDiario).toLocaleString("es-CO")}
+</div>
 </div>
 
 
