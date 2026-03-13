@@ -58,7 +58,7 @@ export const obtenerPagos = (params, config) => api.get("/pagos", { ...config, p
 export const consultarPagosPorCedula = (n, config) => api.get(`/pagos/consultar/${n}`, config);
 export const obtenerPagoPorId = (id, config) => api.get(`/pagos/${id}`, config);
 export const crearPago = (data, config) => api.post("/pagos", data, config);
-export const editarPago = (id, data) => api.put(`/pagos/${id}`, data);
+export const editarPago = (id, data, config) => api.put(`/pagos/editar/${id}`, data, config);
 export const eliminarPago = (id, config) => api.delete(`/pagos/${id}`, config);
 
 // --- PLANILLA ---
