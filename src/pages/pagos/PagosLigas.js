@@ -647,6 +647,18 @@ color: cantidad > 0 ? "white" : "#1e293b"
                 </div>
                 {mesSeleccionado && (
                     <div style={{ overflowX: "auto", borderRadius: "1.5rem", boxShadow: "0 15px 35px rgba(0,0,0,0.15)" }}>
+                    {/* Barra de desplazamiento superior */}
+<div 
+    id="scroll-superior"
+    style={{ overflowX: 'auto', overflowY: 'hidden', width: '100%' }}
+    onScroll={(e) => {
+        const abajo = document.getElementById('contenedor-tabla');
+        if (abajo) abajo.scrollLeft = e.target.scrollLeft;
+    }}
+>
+    {/* Este div interno debe tener el mismo ancho que tu tabla real */}
+    <div style={{ width: '2200px', height: '1px' }}></div> 
+</div>
                         <table style={{ width: "100%", minWidth: "2800px", borderCollapse: "collapse" }}>
                             <thead>
                                 <tr style={{ background: "#1e293b", color: "white" }}>
