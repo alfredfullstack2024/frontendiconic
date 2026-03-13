@@ -798,9 +798,10 @@ infoDia.tipo === "HOY"
                                         );
                                     })
                                 )}
-                            </tbody>
-                        </table>
-                                </div>
+                           </tbody>
+</table>
+
+    </div>
 </>
 )}
 
