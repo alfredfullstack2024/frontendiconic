@@ -246,7 +246,7 @@ const diasConTipo = diasSeleccionados.map(dia => {
     filtroPeriodo === "MES" &&
     filtroDia === "" &&
     filtroSemana === "";
-
+//
 if (sinFiltros) {
     return {
         pagosFiltradosPorEspecialidad: pagos,
