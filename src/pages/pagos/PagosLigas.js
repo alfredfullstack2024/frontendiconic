@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { obtenerClientes } from "../../api/axios";
-
+// redeploy
 // ===========================================
 // ⭐ NUEVA FUNCIÓN AUXILIAR: Obtener mes actual
 // ===========================================
