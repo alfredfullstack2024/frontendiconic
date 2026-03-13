@@ -72,7 +72,7 @@ useEffect(() => {
             const [mesesRes, clientesRes, configRes] = await Promise.all([
                 axios.get(`${backendURL}/pagos-ligas/meses`),
                 obtenerClientes(),
-                axios.get(`${backendURL}/pagos-ligas/valor-diario`).catch(() => ({ data: { valorDiario: 8000 } })),
+                axios.get(`${backendURL}/pagos-ligas/configuracion`).catch(() => ({ data: { valorDiario: 8000 } })),
             ]);
 
             const mesesData = mesesRes.data;
@@ -670,7 +670,8 @@ color: cantidad > 0 ? "white" : "#1e293b"
                                 ) : (
                                     jugadorasFiltradas.map(nombre => {
                                         const dias = getDiasPagadosFiltrados(nombre);
-                                        const total = dias.length * valorDiario;
+                                        const pagoReal = pagosDelMes.find(p => p.nombre.trim() === nombre.trim());
+const total = pagoReal ? pagoReal.total : (dias.length * valorDiario);
                                         const especialidad = getEspecialidadJugadora(nombre);
                                         const tipoPago = getTipoPagoJugadora(nombre);
                                         return (
