@@ -654,8 +654,7 @@ color: cantidad > 0 ? "white" : "#1e293b"
     onScroll={(e) => {
         const abajo = document.getElementById('contenedor-tabla');
         if (abajo) abajo.scrollLeft = e.target.scrollLeft;
-    }}
->
+    }}>
     {/* Este div interno debe tener el mismo ancho que tu tabla real */}
     <div style={{ maxWidth: "2200px", margin: "0 auto", background: "white", borderRadius: "1.5rem", padding: "2.5rem", boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}>
 </div>                        <table style={{ width: "100%", minWidth: "2800px", borderCollapse: "collapse" }}>
