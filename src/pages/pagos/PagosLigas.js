@@ -784,4 +784,9 @@ infoDia.tipo === "HOY"
 </>
 )}
 
+            </div>
+        </div>
+    );
+};
+
 export default PagosLigas;
