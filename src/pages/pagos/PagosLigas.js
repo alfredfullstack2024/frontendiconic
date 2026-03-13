@@ -671,9 +671,12 @@ color: cantidad > 0 ? "white" : "#1e293b"
                                     jugadorasFiltradas.map(nombre => {
                                         const dias = getDiasPagadosFiltrados(nombre);
                                         const pagoReal = pagosDelMes.find(p => p.nombre.trim() === nombre.trim());
-const total = pagoReal ? pagoReal.total : (dias.length * valorDiario);
-                                        const especialidad = getEspecialidadJugadora(nombre);
-                                        const tipoPago = getTipoPagoJugadora(nombre);
+const total = pagosDelMes
+    .filter(p => p.nombre.trim() === nombre.trim())
+    .reduce((acc, p) => acc + (Number(p.total) || 0), 0);
+
+const especialidad = getEspecialidadJugadora(nombre);
+const tipoPago = getTipoPagoJugadora(nombre);
                                         return (
                                             <tr key={nombre}>
                                                 <td style={{ ...tdStyle, fontWeight: "bold", background: "#f8fafc", position: "sticky", left: 0, zIndex: 9, textAlign: "left" }}>
