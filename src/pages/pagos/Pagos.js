@@ -25,7 +25,7 @@ const Pagos = () => {
 
     const [pagos, setPagos] = useState([]);
     const [pagosFiltrados, setPagosFiltrados] = useState([]);
-    const [filtroTipo, setFiltroTipo] = useState("dia"); // 👈 HOY por defecto
+    const [filtroTipo, setFiltroTipo] = useState("");// 👈 HOY por defecto
     const [mes, setMes] = useState("");
     const [semana, setSemana] = useState("");
     const [dia, setDia] = useState(todayISO); // 👈 HOY automático
@@ -273,9 +273,6 @@ placeholder="Nombre del cliente"
 
 </Row>
 
-<Button variant="warning" onClick={abrirResumen} className="mt-3">
-Ver Resumen método de pago
-</Button>
 
 </Form>
 
