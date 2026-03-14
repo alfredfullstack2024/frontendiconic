@@ -82,7 +82,7 @@ params.fechaFin = formatLocalDateTime(endDate);
 
     params.fechaInicio = formatLocalDateTime(startDate);
     params.fechaFin = formatLocalDateTime(endDate);
- else if (filtroTipo === "dia" && dia) {
+            }else if (filtroTipo === "dia" && dia) {
     // Forzamos el formato literal para que no convierta zonas horarias
     params.fechaInicio = `${dia}T00:00:00`;
 params.fechaFin = `${dia}T23:59:59`;
