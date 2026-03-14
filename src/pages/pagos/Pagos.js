@@ -274,14 +274,9 @@ params.fechaFin = formatLocalDateTime(endDate);
                         </Row>
                     </Form>
 
-                    <Alert variant="info" className="mt-3 text-center">
-                                           <div style={{display:"none"}} className="mt-4 p-3 bg-success text-white rounded text-center">
-   <h5 className="m-0">
-      TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
-    </h5>
-</div> 
-                        {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
-                    </Alert>
+                   <Alert variant="info" className="mt-3 text-center">
+   {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
+</Alert>
 
                    
                 </Card.Body>
