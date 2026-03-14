@@ -298,29 +298,32 @@ else if (semanaNum === 3) diasSemana = [15,16,17,18,19,20,21];
 else if (semanaNum === 4) diasSemana = [22,23,24,25,26,27,28];
 else if (semanaNum === 5) diasSemana = [29,30,31];
 
-total = pagos.reduce((acc, pago) => {
+let totalDiasSemana = 0;
 
-const tieneDiaSemana = (pago.diasPagados || []).some(d => {
+pagos.forEach(pago => {
 
-const dia = typeof d === "number" ? d : d.dia;
+(pago.diasPagados || []).forEach(d => {
 
-return diasSemana.includes(dia);
+let dia = null;
+
+if (typeof d === "number") dia = d;
+else if (typeof d === "object") dia = d.dia;
+
+if (diasSemana.includes(dia)) {
+totalDiasSemana++;
+}
 
 });
 
-if (tieneDiaSemana) {
-return acc + (Number(pago.total) || 0);
-}
+});
 
-return acc;
-
-},0);
+total = totalDiasSemana * valorDiario;
 
 }
-        else { // MES
+else { // MES
 total = pagos.reduce((acc, pago) => {
-    return acc + (Number(pago.total) || 0);
-}, 0);
+return acc + (Number(pago.total) || 0);
+},0);
 }
 
         // Devolvemos los pagos (filtrados por nombre, especialidad y tipoPago) y el total calculado.
