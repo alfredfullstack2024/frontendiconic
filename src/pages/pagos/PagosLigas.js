@@ -286,31 +286,37 @@ jugadoresConDiaPagado.add(pago.nombre.trim());
             // El total es el número de jugadores que pagaron ESE día (considerando todos los filtros anteriores)
             total = jugadoresConDiaPagado.size * valorDiario;
         }
-        else if (filtroPeriodo === "SEMANA" && filtroSemana) {
-            const semanaNum = parseInt(filtroSemana, 10);
+       else if (filtroPeriodo === "SEMANA" && filtroSemana) {
 
-            let diasSemana = [];
-            if (semanaNum === 1) diasSemana = [1, 2, 3, 4, 5, 6, 7];
-            else if (semanaNum === 2) diasSemana = [8, 9, 10, 11, 12, 13, 14];
-            else if (semanaNum === 3) diasSemana = [15, 16, 17, 18, 19, 20, 21];
-            else if (semanaNum === 4) diasSemana = [22, 23, 24, 25, 26, 27, 28];
-            else if (semanaNum === 5) diasSemana = [29, 30, 31];
+const semanaNum = parseInt(filtroSemana, 10);
 
-            const diasPagadosEnSemana = new Set();
-            // Contar la cantidad de pares únicos (jugador-día) que cumplen el filtro
-            pagos.forEach(pago => {
-                pago.diasPagados.forEach(d => {
+let diasSemana = [];
+
+if (semanaNum === 1) diasSemana = [1,2,3,4,5,6,7];
+else if (semanaNum === 2) diasSemana = [8,9,10,11,12,13,14];
+else if (semanaNum === 3) diasSemana = [15,16,17,18,19,20,21];
+else if (semanaNum === 4) diasSemana = [22,23,24,25,26,27,28];
+else if (semanaNum === 5) diasSemana = [29,30,31];
+
+total = pagos.reduce((acc, pago) => {
+
+const tieneDiaSemana = (pago.diasPagados || []).some(d => {
 
 const dia = typeof d === "number" ? d : d.dia;
 
-if (diasSemana.includes(dia)) {
-                        diasPagadosEnSemana.add(`${pago.nombre.trim()}-${dia}`);
-                    }
-                });
-            });
+return diasSemana.includes(dia);
 
-            total = diasPagadosEnSemana.size * valorDiario;
-        }
+});
+
+if (tieneDiaSemana) {
+return acc + (Number(pago.total) || 0);
+}
+
+return acc;
+
+},0);
+
+}
         else { // MES
 total = pagos.reduce((acc, pago) => {
     return acc + (Number(pago.total) || 0);
