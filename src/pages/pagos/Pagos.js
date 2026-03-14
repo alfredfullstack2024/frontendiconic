@@ -252,83 +252,21 @@ params.fechaFin = formatLocalDateTime(endDate);
 
             <Card className="mb-4">
                 <Card.Body>
-                    <Card.Title>Filtros por Fecha y Nombre</Card.Title>
+                    <Card.Title>Buscar Pagos por Cliente</Card.Title>
                     <Form>
                         <Row className="align-items-end">
-                            <Col md={2}>
-                                <Form.Group>
-                                    <Form.Label>Tipo de Filtro</Form.Label>
-                                    <Form.Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
-                                        <option value="dia">Día</option>
-                                        <option value="semana">Semana</option>
-                                        <option value="mes">Mes</option>
-                                        <option value="anio">Año</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
-
-                            {filtroTipo === "anio" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Año</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            value={anio}
-                                            onChange={(e) => setAnio(e.target.value)}
-                                            placeholder="2025"
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            {filtroTipo === "mes" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Mes</Form.Label>
-                                        <Form.Control type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            {filtroTipo === "semana" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Semana</Form.Label>
-                                        <Form.Control type="week" value={semana} onChange={(e) => setSemana(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            {filtroTipo === "dia" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Día</Form.Label>
-                                        <Form.Control type="date" value={dia} onChange={(e) => setDia(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            <Col md={3}>
-                                <Form.Group>
-                                    <Form.Label>Buscar por Nombre</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={busquedaNombre}
-                                        onChange={(e) => setBusquedaNombre(e.target.value)}
-                                        placeholder="Nombre del cliente"
-                                    />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={3}>
-                                <Row>
-                                    <Col xs={6}>
-                                        <Button variant="primary" className="w-100 mt-3" onClick={fetchPagos}>Filtrar</Button>
-                                    </Col>
-                                    <Col xs={6}>
-                                        <Button variant="secondary" onClick={limpiarFiltros} className="w-100 mt-3">Limpiar</Button>
-                                    </Col>
-                                </Row>
+    <Col md={6}>
+        <Form.Group>
+            <Form.Label>Buscar por Nombre</Form.Label>
+            <Form.Control
+                type="text"
+                value={busquedaNombre}
+                onChange={(e) => setBusquedaNombre(e.target.value)}
+                placeholder="Nombre del cliente"
+            />
+        </Form.Group>
+    </Col>
+</Row>
                                 <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2">
                                     Ver Resumen método de pago
                                 </Button>
