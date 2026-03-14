@@ -67,22 +67,22 @@ params.fechaFin = formatLocalDateTime(endDate);
                 params.fechaInicio = formatLocalDateTime(startDate);
 params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "semana" && semana) {
-                const [year, week] = semana.split("-W");
-                const date = new Date(year, 0, 1);
-                const day = date.getDay();
-                const dayOffset = (day <= 4) ? -day + 1 : -day + 8;
-                date.setDate(date.getDate() + dayOffset + (week - 1) * 7);
 
-                const startDate = new Date(date);
-                startDate.setHours(0, 0, 0, 0);
+    const [year, week] = semana.split("-W");
 
-                const endDate = new Date(startDate);
-                endDate.setDate(endDate.getDate() + 6);
-                endDate.setHours(23, 59, 59, 999);
-                        
-                params.fechaInicio = formatLocalDateTime(startDate);
-params.fechaFin = formatLocalDateTime(endDate);
-           } else if (filtroTipo === "dia" && dia) {
+    const firstDayOfYear = new Date(year, 0, 1);
+    const days = (week - 1) * 7;
+
+    const startDate = new Date(firstDayOfYear.getTime() + days * 86400000);
+    startDate.setHours(0,0,0,0);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    endDate.setHours(23,59,59,999);
+
+    params.fechaInicio = formatLocalDateTime(startDate);
+    params.fechaFin = formatLocalDateTime(endDate);
+ else if (filtroTipo === "dia" && dia) {
     // Forzamos el formato literal para que no convierta zonas horarias
     params.fechaInicio = `${dia}T00:00:00`;
 params.fechaFin = `${dia}T23:59:59`;
@@ -194,22 +194,23 @@ params.fechaFin = formatLocalDateTime(endDate);
                 params.fechaInicio = formatLocalDateTime(startDate);
 params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "semana" && semana) {
-                const [year, week] = semana.split("-W");
-                const date = new Date(year, 0, 1);
-                const day = date.getDay();
-                const dayOffset = (day <= 4) ? -day + 1 : -day + 8;
-                date.setDate(date.getDate() + dayOffset + (week - 1) * 7);
 
-                const startDate = new Date(date);
-                startDate.setHours(0, 0, 0, 0);
+    const [year, week] = semana.split("-W");
 
-                const endDate = new Date(startDate);
-                endDate.setDate(endDate.getDate() + 6);
-                endDate.setHours(23, 59, 59, 999);
-                        
-                params.fechaInicio = formatLocalDateTime(startDate);
-params.fechaFin = formatLocalDateTime(endDate);
-            } else if (filtroTipo === "dia" && dia) {
+    const firstDayOfYear = new Date(year, 0, 1);
+    const days = (week - 1) * 7;
+
+    const startDate = new Date(firstDayOfYear.getTime() + days * 86400000);
+    startDate.setHours(0,0,0,0);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+    endDate.setHours(23,59,59,999);
+
+    params.fechaInicio = formatLocalDateTime(startDate);
+    params.fechaFin = formatLocalDateTime(endDate);
+}
+             else if (filtroTipo === "dia" && dia) {
                 const startDate = new Date(dia);
                 startDate.setHours(0, 0, 0, 0);
                 const endDate = new Date(dia);
@@ -329,9 +330,14 @@ params.fechaFin = formatLocalDateTime(endDate);
                                         <Button variant="secondary" onClick={limpiarFiltros} className="w-100 mt-3">Limpiar</Button>
                                     </Col>
                                 </Row>
-                                <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2">
-                                    Ver Resumen método de pago
-                                </Button>
+                               <Button
+    variant="warning"
+    onClick={abrirResumen}
+    className="w-100 mt-2"
+    style={{ display: "none" }}
+>
+    Ver Resumen método de pago
+</Button>
                             </Col>
                         </Row>
                     </Form>
@@ -453,20 +459,5 @@ params.fechaFin = formatLocalDateTime(endDate);
 };
 
 export default Pagos;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
