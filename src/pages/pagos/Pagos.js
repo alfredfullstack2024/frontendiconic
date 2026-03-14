@@ -11,7 +11,9 @@ const formatCurrencySafe = (amount) => {
 };
 
 const Pagos = () => {
-    const todayISO = new Date().toISOString().split("T")[0];
+    const todayISO = new Date().toLocaleDateString("sv-SE", {
+  timeZone: "America/Bogota"
+});
     const currentYear = new Date().getFullYear();
 
     const [pagos, setPagos] = useState([]);
@@ -75,8 +77,8 @@ const Pagos = () => {
                 params.fechaFin = endDate.toISOString();
            } else if (filtroTipo === "dia" && dia) {
     // Forzamos el formato literal para que no convierta zonas horarias
-    params.fechaInicio = `${dia}T00:00:00.000Z`;
-    params.fechaFin = `${dia}T23:59:59.999Z`;
+    params.fechaInicio = `${dia}T00:00:00`;
+params.fechaFin = `${dia}T23:59:59`;
 }
 
             // A) Obtener el total GENERAL (sin filtros de fecha)
