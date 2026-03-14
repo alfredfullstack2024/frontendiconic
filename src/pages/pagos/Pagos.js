@@ -251,37 +251,40 @@ params.fechaFin = formatLocalDateTime(endDate);
             </Card>
 
             <Card className="mb-4">
-                <Card.Body>
-                    <Card.Title>Buscar Pagos por Cliente</Card.Title>
-                    <Form>
-                        <Row className="align-items-end">
-    <Col md={6}>
-        <Form.Group>
-            <Form.Label>Buscar por Nombre</Form.Label>
-            <Form.Control
-                type="text"
-                value={busquedaNombre}
-                onChange={(e) => setBusquedaNombre(e.target.value)}
-                placeholder="Nombre del cliente"
-            />
-        </Form.Group>
-    </Col>
-</Row>
-                                <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2">
-                                    Ver Resumen método de pago
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
+<Card.Body>
 
-                   <Alert variant="info" className="mt-3 text-center">
-   {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
+<Card.Title>Buscar Pagos por Cliente</Card.Title>
+
+<Form>
+
+<Row className="align-items-end">
+
+<Col md={6}>
+<Form.Group>
+<Form.Label>Buscar por Nombre</Form.Label>
+<Form.Control
+type="text"
+value={busquedaNombre}
+onChange={(e) => setBusquedaNombre(e.target.value)}
+placeholder="Nombre del cliente"
+/>
+</Form.Group>
+</Col>
+
+</Row>
+
+<Button variant="warning" onClick={abrirResumen} className="mt-3">
+Ver Resumen método de pago
+</Button>
+
+</Form>
+
+<Alert variant="info" className="mt-3 text-center">
+{new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
 </Alert>
 
-                   
-                </Card.Body>
-            </Card>
-
+</Card.Body>
+</Card>
           <div className="mb-3 d-flex flex-wrap gap-2">
     <Button variant="primary" onClick={() => navigate("/pagos/crear")}>
         Crear pago
