@@ -158,13 +158,12 @@ params.fechaFin = `${dia}T23:59:59`;
             setIsLoading(false);
         }
     };
-   const formatFecha = (fecha) => {
+  const formatFecha = (fecha) => {
     if (!fecha) return "Sin fecha";
-    // Usamos UTC para evitar que el navegador reste horas de Colombia
-    const d = new Date(fecha);
-    const dia = String(d.getUTCDate()).padStart(2, '0');
-    const mes = String(d.getUTCMonth() + 1).padStart(2, '0');
-    return `${dia}/${mes}/${d.getUTCFullYear()}`;
+
+    return new Date(fecha).toLocaleDateString("es-CO", {
+        timeZone: "America/Bogota"
+    });
 };
 
     const abrirResumen = async () => {
@@ -331,7 +330,7 @@ params.fechaFin = `${dia}T23:59:59`;
                     </Form>
 
                     <Alert variant="info" className="mt-3 text-center">
-                        Información del día -- {new Date().toLocaleDateString("es-ES")} para ver más información use los filtros
+                        {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
                     </Alert>
 
                     <div className="mt-4 p-3 bg-success text-white rounded text-center">
