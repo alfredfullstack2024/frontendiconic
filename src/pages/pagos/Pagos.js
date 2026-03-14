@@ -25,7 +25,7 @@ const Pagos = () => {
 
     const [pagos, setPagos] = useState([]);
     const [pagosFiltrados, setPagosFiltrados] = useState([]);
-    const [filtroTipo, setFiltroTipo] = useState("");// 👈 HOY por defecto
+    const [filtroTipo, setFiltroTipo] = useState("dia"); // 👈 HOY por defecto
     const [mes, setMes] = useState("");
     const [semana, setSemana] = useState("");
     const [dia, setDia] = useState(todayISO); // 👈 HOY automático
@@ -251,37 +251,104 @@ params.fechaFin = formatLocalDateTime(endDate);
             </Card>
 
             <Card className="mb-4">
-<Card.Body>
+                <Card.Body>
+                    <Card.Title>Filtros por Fecha y Nombre</Card.Title>
+                    <Form>
+                        <Row className="align-items-end">
+                            <Col md={2}>
+                                <Form.Group>
+                                    <Form.Label>Tipo de Filtro</Form.Label>
+                                    <Form.Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
+                                        <option value="dia">Día</option>
+                                        <option value="semana">Semana</option>
+                                        <option value="mes">Mes</option>
+                                        <option value="anio">Año</option>
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
 
-<Card.Title>Buscar Pagos por Cliente</Card.Title>
+                            {filtroTipo === "anio" && (
+                                <Col md={2}>
+                                    <Form.Group>
+                                        <Form.Label>Año</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            value={anio}
+                                            onChange={(e) => setAnio(e.target.value)}
+                                            placeholder="2025"
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            )}
 
-<Form>
+                            {filtroTipo === "mes" && (
+                                <Col md={2}>
+                                    <Form.Group>
+                                        <Form.Label>Mes</Form.Label>
+                                        <Form.Control type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                            )}
 
-<Row className="align-items-end">
+                            {filtroTipo === "semana" && (
+                                <Col md={2}>
+                                    <Form.Group>
+                                        <Form.Label>Semana</Form.Label>
+                                        <Form.Control type="week" value={semana} onChange={(e) => setSemana(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                            )}
 
-<Col md={6}>
-<Form.Group>
-<Form.Label>Buscar por Nombre</Form.Label>
-<Form.Control
-type="text"
-value={busquedaNombre}
-onChange={(e) => setBusquedaNombre(e.target.value)}
-placeholder="Nombre del cliente"
-/>
-</Form.Group>
-</Col>
+                            {filtroTipo === "dia" && (
+                                <Col md={2}>
+                                    <Form.Group>
+                                        <Form.Label>Día</Form.Label>
+                                        <Form.Control type="date" value={dia} onChange={(e) => setDia(e.target.value)} />
+                                    </Form.Group>
+                                </Col>
+                            )}
 
-</Row>
+                            <Col md={3}>
+                                <Form.Group>
+                                    <Form.Label>Buscar por Nombre</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={busquedaNombre}
+                                        onChange={(e) => setBusquedaNombre(e.target.value)}
+                                        placeholder="Nombre del cliente"
+                                    />
+                                </Form.Group>
+                            </Col>
 
+                            <Col md={3}>
+                                <Row>
+                                    <Col xs={6}>
+                                        <Button variant="primary" className="w-100 mt-3" onClick={fetchPagos}>Filtrar</Button>
+                                    </Col>
+                                    <Col xs={6}>
+                                        <Button variant="secondary" onClick={limpiarFiltros} className="w-100 mt-3">Limpiar</Button>
+                                    </Col>
+                                </Row>
+                                <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2">
+                                    Ver Resumen método de pago
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form>
 
-</Form>
+                    <Alert variant="info" className="mt-3 text-center">
+                                            <div className="mt-4 p-3 bg-success text-white rounded text-center">
+    <h5 className="m-0">
+        TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
+    </h5>
+</div>
+                        {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
+                    </Alert>
 
-<Alert variant="info" className="mt-3 text-center">
-{new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
-</Alert>
+                   
+                </Card.Body>
+            </Card>
 
-</Card.Body>
-</Card>
           <div className="mb-3 d-flex flex-wrap gap-2">
     <Button variant="primary" onClick={() => navigate("/pagos/crear")}>
         Crear pago
