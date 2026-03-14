@@ -337,11 +337,11 @@ params.fechaFin = formatLocalDateTime(endDate);
                     </Form>
 
                     <Alert variant="info" className="mt-3 text-center">
-                                           // <div className="mt-4 p-3 bg-success text-white rounded text-center">
-   // <h5 className="m-0">
-     //   TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
-    //</h5>
-//</div> 
+                                           <div style={{display:"none"}} className="mt-4 p-3 bg-success text-white rounded text-center">
+   <h5 className="m-0">
+      TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
+    </h5>
+</div> 
                         {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
                     </Alert>
 
