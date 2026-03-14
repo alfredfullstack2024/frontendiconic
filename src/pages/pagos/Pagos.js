@@ -330,7 +330,7 @@ params.fechaFin = formatLocalDateTime(endDate);
                                     </Col>
                                 </Row>
                                 <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2">
-                                    Resumen método de pago
+                                    Ver Resumen método de pago
                                 </Button>
                             </Col>
                         </Row>
@@ -340,12 +340,7 @@ params.fechaFin = formatLocalDateTime(endDate);
                         {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
                     </Alert>
 
-                    <div className="mt-4 p-3 bg-success text-white rounded text-center">
-                        <h5 className="m-0">
-                            TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
-                        </h5>
-                    </div>
-
+                   
                 </Card.Body>
             </Card>
 
