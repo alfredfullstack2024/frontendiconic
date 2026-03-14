@@ -311,15 +311,11 @@ if (diasSemana.includes(dia)) {
 
             total = diasPagadosEnSemana.size * valorDiario;
         }
-        else { // MES (Por defecto o si no hay filtro de día/semana)
-            // Calcular el total de todos los pagos que ya están filtrados por nombre, especialidad y tipoPago
-            let totalDias = 0;
-            pagos.forEach(pago => {
-                totalDias += pago.diasPagados?.length || 0;
-            }
-            );
-            total = totalDias * valorDiario;
-        }
+        else { // MES
+total = pagos.reduce((acc, pago) => {
+    return acc + (Number(pago.total) || 0);
+}, 0);
+}
 
         // Devolvemos los pagos (filtrados por nombre, especialidad y tipoPago) y el total calculado.
         return {
