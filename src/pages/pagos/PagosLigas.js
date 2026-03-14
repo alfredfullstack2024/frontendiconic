@@ -239,17 +239,10 @@ const diasConTipo = diasSeleccionados.map(dia => {
     const pagosFiltrados = useMemo(() => {
         let pagos = pagosDelMes;
         let total = 0;
-        const sinFiltros =
-    filtroNombre === "" &&
-    filtroEspecialidad === "TODAS" &&
-    filtroTipoPago === "TODOS" &&
-    filtroPeriodo === "MES" &&
-    filtroDia === "" &&
-    filtroSemana === "";
-//
-if (sinFiltros) {
+        // si aún no hay datos cargados
+if (pagos.length === 0) {
     return {
-        pagosFiltradosPorEspecialidad: pagos,
+        pagosFiltradosPorEspecialidad: [],
         totalFiltrado: 0
     };
 }
