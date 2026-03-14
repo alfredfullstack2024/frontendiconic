@@ -10,6 +10,13 @@ const formatCurrencySafe = (amount) => {
     return `$${value.toLocaleString("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 };
 
+// 🔧 Corrige el problema de zona horaria Colombia
+const formatLocalDateTime = (date) => {
+    return date
+        .toLocaleString("sv-SE", { timeZone: "America/Bogota" })
+        .replace(" ", "T");
+};
+
 const Pagos = () => {
     const todayISO = new Date().toLocaleDateString("sv-SE", {
   timeZone: "America/Bogota"
@@ -48,8 +55,8 @@ const Pagos = () => {
                 const startDate = new Date(anio, 0, 1);
                 const endDate = new Date(anio, 11, 31);
                 endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             }
 
             if (filtroTipo === "mes" && mes) {
@@ -57,8 +64,8 @@ const Pagos = () => {
                 const startDate = new Date(year, month - 1, 1);
                 const endDate = new Date(year, month, 0);
                 endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "semana" && semana) {
                 const [year, week] = semana.split("-W");
                 const date = new Date(year, 0, 1);
@@ -73,8 +80,8 @@ const Pagos = () => {
                 endDate.setDate(endDate.getDate() + 6);
                 endDate.setHours(23, 59, 59, 999);
                         
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
            } else if (filtroTipo === "dia" && dia) {
     // Forzamos el formato literal para que no convierta zonas horarias
     params.fechaInicio = `${dia}T00:00:00`;
@@ -175,8 +182,8 @@ params.fechaFin = `${dia}T23:59:59`;
                 const startDate = new Date(anio, 0, 1);
                 const endDate = new Date(anio, 11, 31);
                 endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             }
 
             if (filtroTipo === "mes" && mes) {
@@ -184,8 +191,8 @@ params.fechaFin = `${dia}T23:59:59`;
                 const startDate = new Date(year, month - 1, 1);
                 const endDate = new Date(year, month, 0);
                 endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "semana" && semana) {
                 const [year, week] = semana.split("-W");
                 const date = new Date(year, 0, 1);
@@ -200,15 +207,15 @@ params.fechaFin = `${dia}T23:59:59`;
                 endDate.setDate(endDate.getDate() + 6);
                 endDate.setHours(23, 59, 59, 999);
                         
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "dia" && dia) {
                 const startDate = new Date(dia);
                 startDate.setHours(0, 0, 0, 0);
                 const endDate = new Date(dia);
                 endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = startDate.toISOString();
-                params.fechaFin = endDate.toISOString();
+                params.fechaInicio = formatLocalDateTime(startDate);
+params.fechaFin = formatLocalDateTime(endDate);
             }
 
             const { data } = await api.get("/pagos/resumen-metodo-pago", { params });
