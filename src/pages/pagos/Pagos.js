@@ -72,8 +72,10 @@ const Pagos = () => {
             setTotalRecaudadoGeneral(totalGeneralMonto);
 
             // B) Obtener pagos filtrados
-            const filteredResponse = await api.get("/pagos", { params });
-            const fetchedPagos = filteredResponse.data.pagos || [];
+           const filteredResponse = await api.get("/pagos"); // Quitamos params
+const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) => 
+    new Date(b.fecha) - new Date(a.fecha)
+);
             const totalBackend = filteredResponse.data.total || 0;
             
             setPagos(fetchedPagos); 
@@ -181,134 +183,76 @@ const Pagos = () => {
     const irAPagames = () => navigate("/pagos/pagames");
 
     return (
-        <div className="container mt-4">
-            <h2>Pagos</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
+    <div className="container mt-4">
+        <h2>Pagos</h2>
+        {error && <Alert variant="danger">{error}</Alert>}
 
-            <Card bg="dark" text="white" className="mb-4 shadow-lg">
-                <Card.Body className="text-center py-3">
-                    <Card.Title className="m-0 h4">
-                        TOTAL RECAUDADO (GENERAL): {isLoading ? <Spinner animation="border" size="sm" /> : formatCurrencySafe(totalRecaudadoGeneral)}
-                    </Card.Title>
-                </Card.Body>
-            </Card>
+        {/* Formulario simplificado: Solo búsqueda por nombre */}
+        <Card className="mb-4">
+            <Card.Body>
+                <Form>
+                    <Row className="align-items-end">
+                        <Col md={9}>
+                            <Form.Group>
+                                <Form.Label>Buscar por Nombre</Form.Label>
+                                <Form.Control 
+                                    type="text" 
+                                    value={busquedaNombre} 
+                                    onChange={(e) => setBusquedaNombre(e.target.value)} 
+                                    placeholder="Escriba el nombre del cliente..." 
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={3}>
+                            <Button variant="secondary" onClick={limpiarFiltros} className="w-100">
+                                Limpiar Búsqueda
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form>
+            </Card.Body>
+        </Card>
 
-            <Card className="mb-4">
-                <Card.Body>
-                    <Card.Title>Filtros por Fecha y Nombre</Card.Title>
-                    <Form>
-                        <Row className="align-items-end">
-                            <Col md={2}>
-                                <Form.Group>
-                                    <Form.Label>Tipo de Filtro</Form.Label>
-                                    <Form.Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
-                                        <option value="dia">Día</option>
-                                        <option value="mes">Mes</option>
-                                        <option value="anio">Año</option>
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col>
+        {/* Botones de acción rápidos */}
+        <div className="mb-3 d-flex flex-wrap gap-2">
+            <Button variant="primary" onClick={() => navigate("/pagos/crear")}>Crear pago</Button>
+            <Button variant="success" onClick={irAPagosLigas}>Pagos Ligas</Button>
+            <Button variant="info" onClick={irAPagames}>Pagos Mes</Button>
+            <Button variant="danger" onClick={() => navigate("/pagos/pago-rapido")}>Pago Rápido</Button>
+            <Button variant="dark" onClick={() => navigate("/pagos/resumen-general")}>Resumen General</Button>
+        </div>
 
-                            {filtroTipo === "anio" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Año</Form.Label>
-                                        <Form.Control type="number" value={anio} onChange={(e) => setAnio(e.target.value)} placeholder="2025" />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            {filtroTipo === "mes" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Mes</Form.Label>
-                                        <Form.Control type="month" value={mes} onChange={(e) => setMes(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            {filtroTipo === "dia" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Día</Form.Label>
-                                        <Form.Control type="date" value={dia} onChange={(e) => setDia(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
-
-                            <Col md={3}>
-                                <Form.Group>
-                                    <Form.Label>Buscar por Nombre</Form.Label>
-                                    <Form.Control type="text" value={busquedaNombre} onChange={(e) => setBusquedaNombre(e.target.value)} placeholder="Nombre del cliente" />
-                                </Form.Group>
-                            </Col>
-
-                            <Col md={3}>
-                                <Row>
-                                    <Col xs={6}>
-                                        <Button variant="primary" className="w-100 mt-3" onClick={fetchPagos}>Filtrar</Button>
-                                    </Col>
-                                    <Col xs={6}>
-                                        <Button variant="secondary" onClick={limpiarFiltros} className="w-100 mt-3">Limpiar</Button>
-                                    </Col>
-                                </Row>
-                                <Button variant="warning" onClick={abrirResumen} className="w-100 mt-2" style={{ display: "none" }}>Ver Resumen</Button>
-                            </Col>
-                        </Row>
-                    </Form>
-
-                    <Alert variant="info" className="mt-3 text-center">
-                        <div className="mt-4 p-3 bg-success text-white rounded text-center">
-                            <h5 className="m-0">
-                                TOTAL FILTRADO ({filtroTipo.toUpperCase()}): {isLoading && pagosFiltrados.length === 0 ? <Spinner animation="border" size="sm" variant="light"/> : formatCurrencySafe(totalRecaudadoFiltrado)}
-                            </h5>
-                        </div>
-                        {new Date().toLocaleDateString("es-CO", { timeZone: "America/Bogota" })} para ver más información use los filtros
-                    </Alert>
-                </Card.Body>
-            </Card>
-
-            <div className="mb-3 d-flex flex-wrap gap-2">
-                <Button variant="primary" onClick={() => navigate("/pagos/crear")}>Crear pago</Button>
-                <Button variant="success" onClick={irAPagosLigas}>Pagos Ligas</Button>
-                <Button variant="info" onClick={irAPagames}>Pagos Mes</Button>
-                <Button variant="danger" onClick={() => navigate("/pagos/pago-rapido")}>Pago Rápido</Button>
-                <Button variant="dark" onClick={() => navigate("/pagos/resumen-general")}>Resumen General</Button>
-            </div>
-
-            {isLoading && <Alert variant="info">Cargando pagos...</Alert>}
-            {!isLoading && pagosFiltrados.length === 0 && !error && (
-                <Alert variant="info">No hay pagos para mostrar en este periodo/filtro.</Alert>
-            )}
-
-            {!isLoading && pagosFiltrados.length > 0 && (
-                <Table striped bordered hover responsive>
-                    <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Monto</th>
-                            <th>Fecha</th>
-                            <th>Producto</th>
-                            <th>Acciones</th>
+        {isLoading && <div className="text-center"><Spinner animation="border" /></div>}
+        
+        {!isLoading && pagosFiltrados.length > 0 && (
+            <Table striped bordered hover responsive className="shadow-sm">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {pagosFiltrados.map((pago) => (
+                        <tr key={pago._id}>
+                            <td>{pago.cliente ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}` : pago.clienteManual || "Sin cliente"}</td>
+                            <td className="fw-bold">{formatCurrencySafe(pago.monto)}</td>
+                            <td>{formatFecha(pago.fecha)}</td>
+                            <td>{pago.producto?.nombre || pago.productoManual || "No especificado"}</td>
+                            <td>
+                                <Button variant="warning" size="sm" className="me-2" onClick={() => navigate(`/pagos/editar/${pago._id}`)}>Editar</Button>
+                                <Button variant="danger" size="sm" onClick={() => eliminarPago(pago._id)}>Eliminar</Button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {pagosFiltrados.map((pago) => (
-                            <tr key={pago._id || `${pago.fecha}-${pago.monto}`}>
-                                <td>{pago.cliente ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}` : pago.clienteManual || "Sin cliente"}</td>
-                                <td>{formatCurrencySafe(pago.monto)}</td>
-                                <td>{formatFecha(pago.fecha)}</td>
-                                <td>{pago.producto?.nombre || pago.productoManual || "No especificado"}</td>
-                                <td>
-                                    <Button variant="warning" size="sm" className="me-2" onClick={() => navigate(`/pagos/editar/${pago._id}`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => eliminarPago(pago._id)}>Eliminar</Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            )}
-
+                    ))}
+                </tbody>
+            </Table>
+        )}
+    </div>
+);
             <Modal show={showResumen} onHide={() => setShowResumen(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Resumen por Método de Pago ({filtroTipo.toUpperCase()})</Modal.Title>
@@ -334,7 +278,7 @@ const Pagos = () => {
                                 </tr>
                             </tbody>
                         </Table>
-                    )}
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowResumen(false)}>Cerrar</Button>
