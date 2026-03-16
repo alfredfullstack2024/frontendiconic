@@ -26,55 +26,52 @@ const [mes, setMes] = useState(mesActual);
 };
 
     const cargarResumen = async () => {
-        try {
-            setLoading(true);
-            setError("");
+    try {
+        setLoading(true);
+        setError("");
 
-            const { startDate, endDate } = obtenerRangoFechas();
+        const { startDate, endDate } = obtenerRangoFechas();
 
-            if (!startDate || !endDate) {
-                setError("Selecciona un filtro válido");
-                return;
-            }finally {
-    setLoading(false);
-}
+        const res = await api.get("/reportes/resumen-general", {
+            params: {
+                fechaInicio: startDate.toISOString(),
+                fechaFin: endDate.toISOString(),
+            },
+        });
+
+        setData({
+            ligas: {
+                total: res.data?.ligas?.total || 0,
+                efectivo: res.data?.ligas?.efectivo || 0,
+                transferencia: res.data?.ligas?.transferencia || 0,
+                tarjeta: res.data?.ligas?.tarjeta || 0,
+            },
+            mensualidades: {
+                total: res.data?.mensualidades?.total || 0,
+                efectivo: res.data?.mensualidades?.efectivo || 0,
+                transferencia: res.data?.mensualidades?.transferencia || 0,
+                tarjeta: res.data?.mensualidades?.tarjeta || 0,
+            },
+            productos: {
+                total: res.data?.productos?.total || 0,
+                efectivo: res.data?.productos?.efectivo || 0,
+                transferencia: res.data?.productos?.transferencia || 0,
+                tarjeta: res.data?.productos?.tarjeta || 0,
+            },
+            totalGeneral: res.data?.totalGeneral || 0,
+        });
+
+    } catch (e) {
+        console.error("Error resumen general", e);
+        setError("Error al cargar el resumen general");
+    } finally {
+        setLoading(false);
+    }
 };
-
-            const res = await api.get("/reportes/resumen-general", {
-                params: {
-                    fechaInicio: startDate.toISOString(),
-                    fechaFin: endDate.toISOString(),
-                },
-            });
-
-            setData({
-                ligas: {
-                    total: res.data?.ligas?.total || 0,
-                    efectivo: res.data?.ligas?.efectivo || 0,
-                    transferencia: res.data?.ligas?.transferencia || 0,
-                    tarjeta: res.data?.ligas?.tarjeta || 0,
-                },
-                mensualidades: {
-                    total: res.data?.mensualidades?.total || 0,
-                    efectivo: res.data?.mensualidades?.efectivo || 0,
-                    transferencia: res.data?.mensualidades?.transferencia || 0,
-                    tarjeta: res.data?.mensualidades?.tarjeta || 0,
-                },
-                productos: {
-                    total: res.data?.productos?.total || 0,
-                    efectivo: res.data?.productos?.efectivo || 0,
-                    transferencia: res.data?.productos?.transferencia || 0,
-                    tarjeta: res.data?.productos?.tarjeta || 0,
-                },
-                totalGeneral: res.data?.totalGeneral || 0,
-            });
-        } catch (e) {
-            console.error("Error resumen general", e);
-            setError("Error al cargar el resumen general");
-        } finally {
-            setLoading(false);
-        }
-    };
+   useEffect(() => {
+    cargarResumen();
+}, []);
+}, []);
 
     // Componente interno para no repetir código de las tarjetas
     const StatCard = ({ title, stats }) => (
@@ -112,18 +109,16 @@ const [mes, setMes] = useState(mesActual);
                        
 
                        
-                        {filtroTipo === "mes" && (
                             <Col md={3}>
-                                <Form.Group>
-                                    <Form.Label>Mes</Form.Label>
-                                    <Form.Control
-                                        type="month"
-                                        value={mes}
-                                        onChange={(e) => setMes(e.target.value)}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        )}
+    <Form.Group>
+        <Form.Label>Mes</Form.Label>
+        <Form.Control
+            type="month"
+            value={mes}
+            onChange={(e) => setMes(e.target.value)}
+        />
+    </Form.Group>
+</Col>
 
                         
 
