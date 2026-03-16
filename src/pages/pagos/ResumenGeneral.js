@@ -71,7 +71,7 @@ const [mes, setMes] = useState(mesActual);
    useEffect(() => {
     cargarResumen();
 }, []);
-}, []);
+
 
     // Componente interno para no repetir código de las tarjetas
     const StatCard = ({ title, stats }) => (
