@@ -46,22 +46,20 @@ return {startDate,endDate};
 
 
 const cargarResumen = async () => {
+  try {
+    setLoading(true);
+    setError("");
+    const { startDate, endDate } = obtenerRangoFechas();
 
-try{
-
-setLoading(true);
-setError("");
-
-const {startDate,endDate} = obtenerRangoFechas();
-
-const res = await api.get("/reportes/resumen-general", {
-  params: {
-    fechaInicio: startDate.toISOString(), // Agregamos .toISOString()
-    fechaFin: endDate.toISOString()      // Agregamos .toISOString()
-  }
-});
-
-setData({
+    // Enviamos las fechas como strings ISO para que el backend no se confunda
+    const res = await api.get("/reportes/resumen-general", {
+      params: {
+        fechaInicio: startDate.toISOString(),
+        fechaFin: endDate.toISOString()
+      }
+    });
+    
+    setData({
 ligas:{
 total:res.data?.ligas?.total || 0,
 efectivo:res.data?.ligas?.efectivo || 0,
