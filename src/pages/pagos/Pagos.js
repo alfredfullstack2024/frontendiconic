@@ -43,6 +43,7 @@ const Pagos = () => {
     const navigate = useNavigate();
 
     // --- 1. Cargar pagos y Totales ---
+    // --- 1. Cargar pagos y Totales (CORREGIDO) ---
     const fetchPagos = useCallback(async () => {
         setIsLoading(true);
         setError("");
@@ -50,41 +51,39 @@ const Pagos = () => {
         try {
             const params = {};
 
-            // 👇 FILTRO POR AÑO (NUEVO)
             if (filtroTipo === "anio" && anio) {
                 const startDate = new Date(anio, 0, 1);
                 const endDate = new Date(anio, 11, 31);
                 endDate.setHours(23, 59, 59, 999);
                 params.fechaInicio = formatLocalDateTime(startDate);
-params.fechaFin = formatLocalDateTime(endDate);
-            }
-
-            if (filtroTipo === "mes" && mes) {
+                params.fechaFin = formatLocalDateTime(endDate);
+            } else if (filtroTipo === "mes" && mes) {
                 const [year, month] = mes.split("-");
                 const startDate = new Date(year, month - 1, 1);
                 const endDate = new Date(year, month, 0);
                 endDate.setHours(23, 59, 59, 999);
                 params.fechaInicio = formatLocalDateTime(startDate);
-params.fechaFin = formatLocalDateTime(endDate);
-            } 
-            else if (filtroTipo === "dia" && dia) {
-    // Forzamos el formato literal para que no convierta zonas horarias
-    params.fechaInicio = `${dia}T00:00:00`;
-params.fechaFin = `${dia}T23:59:59`;
-}
+                params.fechaFin = formatLocalDateTime(endDate);
+            } else if (filtroTipo === "dia" && dia) {
+                // Forzamos el formato literal para evitar conversiones de zona horaria
+                params.fechaInicio = `${dia}T00:00:00`;
+                params.fechaFin = `${dia}T23:59:59`;
+            }
 
-            // A) Obtener el total GENERAL (sin filtros de fecha)
+            // A) Obtener el total GENERAL histórico
             const allResponse = await api.get("/pagos");
             const totalGeneralMonto = (allResponse.data.pagos || [])
                 .reduce((sum, pago) => sum + (pago.monto || 0), 0);
             setTotalRecaudadoGeneral(totalGeneralMonto);
 
-            // B) Obtener los pagos filtrados por fecha
+            // B) Obtener pagos filtrados y el total calculado por el Backend
             const filteredResponse = await api.get("/pagos", { params });
             const fetchedPagos = filteredResponse.data.pagos || [];
+            const totalBackend = filteredResponse.data.total || 0;
             
             setPagos(fetchedPagos); 
             setPagosFiltrados(fetchedPagos); 
+            setTotalRecaudadoFiltrado(totalBackend); // Sincronización con el servidor
             
         } catch (err) {
             setError("Error al cargar los pagos: " + (err.response?.data?.message || err.message));
@@ -94,36 +93,34 @@ params.fechaFin = `${dia}T23:59:59`;
             setIsLoading(false);
         }
     }, [filtroTipo, mes, dia, anio]);
-
+    // --- 2. Filtro local por nombre (CORREGIDO) ---
     useEffect(() => {
-        fetchPagos(); // 👈 carga automática HOY
-    }, [fetchPagos]);
+        let filtrados;
 
-    // --- 2. Filtro local por nombre y cálculo de TOTAL FILTRADO ---
-    useEffect(() => {
+        if (!busquedaNombre) {
+            filtrados = pagos;
+        } else {
+            filtrados = pagos.filter((pago) => {
+                const nombreCliente = pago.cliente
+                    ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
+                    : (pago.clienteManual || "").toLowerCase();
+                return nombreCliente.includes(busquedaNombre.toLowerCase());
+            });
+        }
 
-    let filtrados;
+        setPagosFiltrados(filtrados);
 
-    if (!busquedaNombre) {
-        filtrados = pagos;
-    } else {
-        filtrados = pagos.filter((pago) => {
-            const nombreCliente = pago.cliente
-                ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-                : (pago.clienteManual || "").toLowerCase();
+        // Si hay una búsqueda activa, sumamos los visibles. 
+        // Si no, respetamos la suma total de ese periodo que trajo el backend.
+        if (busquedaNombre) {
+            const sumaVisible = filtrados.reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
+            setTotalRecaudadoFiltrado(sumaVisible);
+        } else {
+            const sumaTotalPeriodo = pagos.reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
+            setTotalRecaudadoFiltrado(sumaTotalPeriodo);
+        }
 
-            return nombreCliente.includes(busquedaNombre.toLowerCase());
-        });
-    }
-
-    setPagosFiltrados(filtrados);
-
-    // usar total que manda backend
-    setTotalRecaudadoFiltrado(
-        filtrados.reduce((sum, pago) => sum + Number(pago.monto || 0), 0)
-    );
-
-}, [busquedaNombre, pagos]);
+    }, [busquedaNombre, pagos]);
     const limpiarFiltros = () => {
         setFiltroTipo("dia");
         setDia(todayISO);
