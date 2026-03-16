@@ -55,10 +55,10 @@ setError("");
 const {startDate,endDate} = obtenerRangoFechas();
 
 const res = await api.get("/reportes/resumen-general",{
-params:{
-fechaInicio:startDate.toISOString(),
-fechaFin:endDate.toISOString()
-}
+ params:{
+  fechaInicio:startDate,
+  fechaFin:endDate
+ }
 });
 
 setData({
