@@ -283,10 +283,11 @@ const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) =>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowResumen(false)}>Cerrar</Button>
                 </Modal.Footer>
+           </Modal.Footer>
             </Modal>
-        </div>
-    );
-};
+        </div> 
+        </> 
+    ); 
+}; 
 
 export default Pagos;
-
