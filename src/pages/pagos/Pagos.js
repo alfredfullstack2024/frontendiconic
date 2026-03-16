@@ -252,7 +252,7 @@ const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) =>
             </Table>
         )}
     </div>
-);
+
             <Modal show={showResumen} onHide={() => setShowResumen(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Resumen por Método de Pago ({filtroTipo.toUpperCase()})</Modal.Title>
