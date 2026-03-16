@@ -58,12 +58,15 @@ const Pagos = () => {
                 params.fechaInicio = formatLocalDateTime(startDate);
                 params.fechaFin = formatLocalDateTime(endDate);
             } else if (filtroTipo === "mes" && mes) {
-                const [year, month] = mes.split("-");
-                const startDate = new Date(year, month - 1, 1);
-                const endDate = new Date(year, month, 0);
-                endDate.setHours(23, 59, 59, 999);
-                params.fechaInicio = formatLocalDateTime(startDate);
-                params.fechaFin = formatLocalDateTime(endDate);
+    const [year, month] = mes.split("-");
+    // Usar formato ISO YYYY-MM-DD para evitar errores de zona horaria al enviar al back
+    const startDate = `${year}-${month}-01T00:00:00`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${month}-${lastDay}T23:59:59`;
+    
+    params.fechaInicio = startDate;
+    params.fechaFin = endDate;
+}
             } else if (filtroTipo === "dia" && dia) {
                 // Forzamos el formato literal para evitar conversiones de zona horaria
                 params.fechaInicio = `${dia}T00:00:00`;
@@ -94,33 +97,30 @@ const Pagos = () => {
         }
     }, [filtroTipo, mes, dia, anio]);
     // --- 2. Filtro local por nombre (CORREGIDO) ---
-    useEffect(() => {
-        let filtrados;
+   // En src/pages/pagos/Pagos.js -> useEffect de busquedaNombre
+useEffect(() => {
+    let filtrados;
 
-        if (!busquedaNombre) {
-            filtrados = pagos;
-        } else {
-            filtrados = pagos.filter((pago) => {
-                const nombreCliente = pago.cliente
-                    ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
-                    : (pago.clienteManual || "").toLowerCase();
-                return nombreCliente.includes(busquedaNombre.toLowerCase());
-            });
-        }
+    if (!busquedaNombre) {
+        filtrados = pagos;
+    } else {
+        filtrados = pagos.filter((pago) => {
+            const nombreCliente = pago.cliente
+                ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
+                : (pago.clienteManual || "").toLowerCase();
+            return nombreCliente.includes(busquedaNombre.toLowerCase());
+        });
+    }
 
-        setPagosFiltrados(filtrados);
+    setPagosFiltrados(filtrados);
 
-        // Si hay una búsqueda activa, sumamos los visibles. 
-        // Si no, respetamos la suma total de ese periodo que trajo el backend.
-        if (busquedaNombre) {
-            const sumaVisible = filtrados.reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
-            setTotalRecaudadoFiltrado(sumaVisible);
-        } else {
-            const sumaTotalPeriodo = pagos.reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
-            setTotalRecaudadoFiltrado(sumaTotalPeriodo);
-        }
+    // --- CORRECCIÓN AQUÍ ---
+    // Usamos Number() y nos aseguramos de que 'pagos' (el array original del fetch) 
+    // sea la fuente de verdad cuando no hay búsqueda.
+    const suma = filtrados.reduce((sum, pago) => sum + Number(pago.monto || 0), 0);
+    setTotalRecaudadoFiltrado(suma);
 
-    }, [busquedaNombre, pagos]);
+}, [busquedaNombre, pagos]);
     const limpiarFiltros = () => {
         setFiltroTipo("dia");
         setDia(todayISO);
