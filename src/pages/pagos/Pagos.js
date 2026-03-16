@@ -27,7 +27,7 @@ const Pagos = () => {
     const [pagosFiltrados, setPagosFiltrados] = useState([]);
     const [filtroTipo, setFiltroTipo] = useState("dia"); // 👈 HOY por defecto
     const [mes, setMes] = useState("");
-    const [semana, setSemana] = useState("");
+    
     const [dia, setDia] = useState(todayISO); // 👈 HOY automático
     const [anio, setAnio] = useState(currentYear.toString()); // 👈 NUEVO
     const [busquedaNombre, setBusquedaNombre] = useState("");
@@ -66,23 +66,8 @@ params.fechaFin = formatLocalDateTime(endDate);
                 endDate.setHours(23, 59, 59, 999);
                 params.fechaInicio = formatLocalDateTime(startDate);
 params.fechaFin = formatLocalDateTime(endDate);
-            } else if (filtroTipo === "semana" && semana) {
-
-    const [year, week] = semana.split("-W");
-
-    const firstDayOfYear = new Date(year, 0, 1);
-    const days = (week - 1) * 7;
-
-    const startDate = new Date(firstDayOfYear.getTime() + days * 86400000);
-    startDate.setHours(0,0,0,0);
-
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-    endDate.setHours(23,59,59,999);
-
-    params.fechaInicio = formatLocalDateTime(startDate);
-    params.fechaFin = formatLocalDateTime(endDate);
-            }else if (filtroTipo === "dia" && dia) {
+            } 
+            else if (filtroTipo === "dia" && dia) {
     // Forzamos el formato literal para que no convierta zonas horarias
     params.fechaInicio = `${dia}T00:00:00`;
 params.fechaFin = `${dia}T23:59:59`;
@@ -108,7 +93,7 @@ params.fechaFin = `${dia}T23:59:59`;
         } finally {
             setIsLoading(false);
         }
-    }, [filtroTipo, mes, semana, dia, anio]);
+    }, [filtroTipo, mes, dia, anio]);
 
     useEffect(() => {
         fetchPagos(); // 👈 carga automática HOY
@@ -143,7 +128,7 @@ params.fechaFin = `${dia}T23:59:59`;
         setFiltroTipo("dia");
         setDia(todayISO);
         setMes("");
-        setSemana("");
+        
         setAnio(currentYear.toString());
         setBusquedaNombre("");
     };
@@ -193,23 +178,7 @@ params.fechaFin = formatLocalDateTime(endDate);
                 endDate.setHours(23, 59, 59, 999);
                 params.fechaInicio = formatLocalDateTime(startDate);
 params.fechaFin = formatLocalDateTime(endDate);
-            } else if (filtroTipo === "semana" && semana) {
-
-    const [year, week] = semana.split("-W");
-
-    const firstDayOfYear = new Date(year, 0, 1);
-    const days = (week - 1) * 7;
-
-    const startDate = new Date(firstDayOfYear.getTime() + days * 86400000);
-    startDate.setHours(0,0,0,0);
-
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 6);
-    endDate.setHours(23,59,59,999);
-
-    params.fechaInicio = formatLocalDateTime(startDate);
-    params.fechaFin = formatLocalDateTime(endDate);
-}
+            } 
              else if (filtroTipo === "dia" && dia) {
                 const startDate = new Date(dia);
                 startDate.setHours(0, 0, 0, 0);
@@ -261,7 +230,7 @@ params.fechaFin = formatLocalDateTime(endDate);
                                     <Form.Label>Tipo de Filtro</Form.Label>
                                     <Form.Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
                                         <option value="dia">Día</option>
-                                        <option value="semana">Semana</option>
+                                        
                                         <option value="mes">Mes</option>
                                         <option value="anio">Año</option>
                                     </Form.Select>
@@ -291,14 +260,7 @@ params.fechaFin = formatLocalDateTime(endDate);
                                 </Col>
                             )}
 
-                            {filtroTipo === "semana" && (
-                                <Col md={2}>
-                                    <Form.Group>
-                                        <Form.Label>Semana</Form.Label>
-                                        <Form.Control type="week" value={semana} onChange={(e) => setSemana(e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                            )}
+                           
 
                             {filtroTipo === "dia" && (
                                 <Col md={2}>
