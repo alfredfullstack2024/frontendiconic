@@ -182,12 +182,12 @@ const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) =>
     const irAPagosLigas = () => navigate("/pagos/ligas");
     const irAPagames = () => navigate("/pagos/pagames");
 
-    return (
+   return (
+<>
     <div className="container mt-4">
         <h2>Pagos</h2>
         {error && <Alert variant="danger">{error}</Alert>}
 
-        {/* Formulario simplificado: Solo búsqueda por nombre */}
         <Card className="mb-4">
             <Card.Body>
                 <Form>
@@ -213,7 +213,6 @@ const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) =>
             </Card.Body>
         </Card>
 
-        {/* Botones de acción rápidos */}
         <div className="mb-3 d-flex flex-wrap gap-2">
             <Button variant="primary" onClick={() => navigate("/pagos/crear")}>Crear pago</Button>
             <Button variant="success" onClick={irAPagosLigas}>Pagos Ligas</Button>
@@ -253,41 +252,39 @@ const fetchedPagos = (filteredResponse.data.pagos || []).sort((a, b) =>
         )}
     </div>
 
-            <Modal show={showResumen} onHide={() => setShowResumen(false)} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Resumen por Método de Pago ({filtroTipo.toUpperCase()})</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {resumen.length === 0 ? (
-                        <Alert variant="info">No hay datos disponibles.</Alert>
-                    ) : (
-                        <Table striped bordered>
-                            <thead>
-                                <tr><th>Método</th><th>Total</th></tr>
-                            </thead>
-                            <tbody>
-                                {resumen.map((r) => (
-                                    <tr key={r.metodoPago}>
-                                        <td>{r.metodoPago}</td>
-                                        <td>{formatCurrencySafe(r.total)}</td>
-                                    </tr>
-                                ))}
-                                <tr className="fw-bold">
-                                    <td>Total general del periodo</td>
-                                    <td>{formatCurrencySafe(totalRecaudadoFiltrado)}</td>
-                                </tr>
-                            </tbody>
-                        </Table>
-                    
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowResumen(false)}>Cerrar</Button>
-                </Modal.Footer>
-           </Modal.Footer>
-            </Modal>
-        </div> 
-        </> 
-    ); 
+    <Modal show={showResumen} onHide={() => setShowResumen(false)} centered>
+        <Modal.Header closeButton>
+            <Modal.Title>Resumen por Método de Pago ({filtroTipo.toUpperCase()})</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            {resumen.length === 0 ? (
+                <Alert variant="info">No hay datos disponibles.</Alert>
+            ) : (
+                <Table striped bordered>
+                    <thead>
+                        <tr><th>Método</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                        {resumen.map((r) => (
+                            <tr key={r.metodoPago}>
+                                <td>{r.metodoPago}</td>
+                                <td>{formatCurrencySafe(r.total)}</td>
+                            </tr>
+                        ))}
+                        <tr className="fw-bold">
+                            <td>Total general del periodo</td>
+                            <td>{formatCurrencySafe(totalRecaudadoFiltrado)}</td>
+                        </tr>
+                    </tbody>
+                </Table>
+            )}
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowResumen(false)}>Cerrar</Button>
+        </Modal.Footer>
+    </Modal>
+</>
+); 
 }; 
 
 export default Pagos;
